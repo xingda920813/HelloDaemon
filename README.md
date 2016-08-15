@@ -33,7 +33,9 @@
 
 ## 增加实现 :
 
-#### \+ Service和Receiver在:work子进程中运行，与包含UI界面的主进程分离，更不容易被杀
+#### \+ 双Service双进程守护
+
+#### \+ Service和Receiver在:work/:watch进程中运行，与包含UI界面的主进程分离，更不容易被杀
 
 #### \+ 做了防止重复启动Service的处理，可以任意调用startService(Intent i)
 

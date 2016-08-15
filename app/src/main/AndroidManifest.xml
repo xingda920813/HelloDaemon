@@ -26,7 +26,7 @@
         <!-- Service 内部做了判断，若 Service 已在运行，不会重复启动 -->
         <receiver
             android:name=".receiver.WakeUpReceiver"
-            android:process=":wake">
+            android:process=":work">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
@@ -39,7 +39,7 @@
             android:process=":work"/>
 
         <service
-            android:name=".service.android.WorkNotificationService"
+            android:name=".service.android.WorkService$WorkNotificationService"
             android:process=":work"/>
 
         <service
@@ -47,7 +47,7 @@
             android:process=":watch"/>
 
         <service
-            android:name=".service.android.WatchDogNotificationService"
+            android:name=".service.android.WatchDogService$WatchDogNotificationService"
             android:process=":watch"/>
 
     </application>
