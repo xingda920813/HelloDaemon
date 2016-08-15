@@ -2,7 +2,6 @@ package com.xdandroid.hellodaemon.service.android;
 
 import android.app.*;
 import android.app.Notification;
-import android.app.job.*;
 import android.content.*;
 import android.content.pm.*;
 import android.os.*;
