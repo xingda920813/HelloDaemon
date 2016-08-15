@@ -4,7 +4,7 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 
-public class DismissNotificationService extends Service {
+public class WorkNotificationService extends Service {
 
     /**
      * 利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知

@@ -41,7 +41,7 @@ public class WorkService extends Service {
         startForeground(sHashCode, new Notification());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
             //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
-            startService(new Intent(this, DismissNotificationService.class));
+            startService(new Intent(this, WorkNotificationService.class));
 
         //----------业务逻辑----------
         //开始任务前，先检查磁盘中是否有上次销毁时保存的数据
@@ -58,16 +58,19 @@ public class WorkService extends Service {
                 });
         //----------业务逻辑----------
 
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent i = new Intent(this, WakeUpReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(this, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        //设置闹钟 : 每 5 分钟检查一次服务是否在运行，如果不在运行就拉起来
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5 * 60 * 1000, 5 * 60 * 1000, pi);
+        //检查Alarm是否已激活
+        if (!WatchDogService.isAlarmAlreadySet(this, sHashCode)) {
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent i = new Intent(this, WakeUpReceiver.class);
+            PendingIntent pi = PendingIntent.getBroadcast(this, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            //设置闹钟 : 每 15 分钟检查一次服务是否在运行，如果不在运行就拉起来
+            am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pi);
+        }
 
         //简单守护开机广播
         getPackageManager().setComponentEnabledSetting(
                 new ComponentName(getPackageName(), WakeUpReceiver.class.getName()),
-                PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
 
         return START_STICKY;

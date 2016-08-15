@@ -3,9 +3,9 @@
           package="com.xdandroid.hellodaemon">
 
     <!-- BOOT_COMPLETED 需要的权限 -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <!-- CONNECTIVITY_CHANGE 需要的权限 -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -26,7 +26,7 @@
         <!-- Service 内部做了判断，若 Service 已在运行，不会重复启动 -->
         <receiver
             android:name=".receiver.WakeUpReceiver"
-            android:process=":work">
+            android:process=":wake">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
@@ -39,8 +39,16 @@
             android:process=":work"/>
 
         <service
-            android:name=".service.android.DismissNotificationService"
+            android:name=".service.android.WorkNotificationService"
             android:process=":work"/>
+
+        <service
+            android:name=".service.android.WatchDogService"
+            android:process=":watch"/>
+
+        <service
+            android:name=".service.android.WatchDogNotificationService"
+            android:process=":watch"/>
 
     </application>
 
