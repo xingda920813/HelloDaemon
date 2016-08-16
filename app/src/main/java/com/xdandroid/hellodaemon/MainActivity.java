@@ -12,6 +12,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.btn_start).setOnClickListener(v -> sendBroadcast(new Intent(this, WakeUpReceiver.class)));
+        findViewById(R.id.btn_start).setOnClickListener(v -> sendBroadcast(new Intent(WakeUpReceiver.ACTION)));
     }
 }

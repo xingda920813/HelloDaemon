@@ -6,6 +6,8 @@ import com.xdandroid.hellodaemon.service.android.*;
 
 public class WakeUpReceiver extends BroadcastReceiver {
 
+    public static final String ACTION = "com.xdandroid.hellodaemon.WAKE_UP";
+
     /**
      * 监听 3 种系统广播 : BOOT_COMPLETED, CONNECTIVITY_CHANGE, USER_PRESENT
      * 在系统启动完成、网络连接改变、用户屏幕解锁时拉起 Service
