@@ -62,7 +62,7 @@ public class WorkService extends Service {
         Intent i = new Intent(WakeUpReceiver.ACTION);
         PendingIntent pi = PendingIntent.getBroadcast(this, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
         //设置闹钟 : 每 5 分钟检查一次服务是否在运行，如果不在运行就拉起来
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5 * 60 * 1000, pi);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5 * 60 * 1000, 5 * 60 * 1000, pi);
 
         //简单守护开机广播
         getPackageManager().setComponentEnabledSetting(
@@ -101,8 +101,6 @@ public class WorkService extends Service {
         /**
          * 利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
          * 运行在 :work 子进程中
-         *
-         * @return START_NOT_STICKY
          */
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
