@@ -35,11 +35,11 @@ public class WorkService extends Service {
      * @return START_STICKY
      */
     public int onStart(Intent intent, int flags, int startId) {
+        //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
+        startForeground(sHashCode, new Notification());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
             //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
             startService(new Intent(this, WorkNotificationService.class));
-        //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
-        startForeground(sHashCode, new Notification());
 
         //若还没有取消订阅，说明任务仍在运行，为防止重复启动，直接返回START_STICKY
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
