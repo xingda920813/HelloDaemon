@@ -49,7 +49,7 @@ public class WatchDogService extends Service {
     public void onEnd(Intent rootIntent) {
         sAlive = false;
         //重新拉起服务
-        startService(new Intent(this, getClass()));
+        sendBroadcast(new Intent(WakeUpReceiver.ACTION));
     }
 
     /**

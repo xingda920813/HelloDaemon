@@ -99,7 +99,7 @@ public class WorkService extends Service {
         //在onDestroy中取消订阅时，会执行Observable的doOnUnsubscribe(Runnable r)方法，我们在取消订阅时把数据保存到磁盘
         if (sSubscription != null) sSubscription.unsubscribe();
         //重新拉起服务
-        startService(new Intent(this, getClass()));
+        sendBroadcast(new Intent(WakeUpReceiver.ACTION));
     }
 
     /**
