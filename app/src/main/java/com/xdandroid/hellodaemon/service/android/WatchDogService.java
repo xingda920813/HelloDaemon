@@ -33,25 +33,45 @@ public class WatchDogService extends Service {
     }
 
     @Override
-    public void onDestroy() {
-        sAlive = false;
-        startService(new Intent(this, getClass()));
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return onStart(intent, flags, startId);
     }
 
+    /**
+     * Note : 多进程情况下与Service通信需使用AIDL
+     */
     @Override
     public IBinder onBind(Intent intent) {
         onStart(intent, 0, 0);
         return null;
     }
 
+    public void onEnd(Intent rootIntent) {
+        sAlive = false;
+        //重新拉起服务
+        startService(new Intent(this, getClass()));
+    }
+
+    /**
+     * 最近任务列表中划掉卡片时回调
+     */
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        onEnd(rootIntent);
+    }
+
+    /**
+     * 设置-正在运行中停止服务时回调
+     */
+    @Override
+    public void onDestroy() {
+        onEnd(null);
+    }
+
     public static class WatchDogNotificationService extends Service {
 
         /**
+         * 利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
          * 运行在 :watch 子进程中
          */
         @Override

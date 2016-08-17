@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.content.*;
 import android.content.pm.*;
 import android.os.*;
+import android.widget.*;
 
 import com.xdandroid.hellodaemon.receiver.*;
 
@@ -49,12 +50,15 @@ public class WorkService extends Service {
         sSubscription = Observable
                 //每5秒钟执行一次Subscriber的onNext方法
                 //interval操作符默认在Schedulers.computation()调度器上运行，因此不会阻塞主线程
-                .interval(5, TimeUnit.SECONDS)
+                .interval(3, TimeUnit.SECONDS)
                 //在onDestroy中取消订阅时，先把数据保存到磁盘，并进行收尾、清理工作
-                .doOnUnsubscribe(() -> System.out.println("保存数据到磁盘。"))
-                .subscribe(aLong -> {
-                    //void onNext(Long aLong)
-                    System.out.println("每5秒采集一次数据...");
+                .doOnUnsubscribe(() -> {
+                    System.out.println("保存数据到磁盘。");
+                    Toast.makeText(this, "保存数据到磁盘。", Toast.LENGTH_SHORT).show();
+                })
+                .subscribe(count -> {
+                    //void onNext(Long count)
+                    System.out.println("每 3 秒采集一次数据... count = " + count);
                 });
         //----------业务逻辑----------
 
@@ -73,27 +77,45 @@ public class WorkService extends Service {
         return START_STICKY;
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return onStart(intent, flags, startId);
+    }
+
+    /**
+     * Note : 多进程情况下与Service通信需使用AIDL
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        onStart(intent, 0, 0);
+        return null;
+    }
+
     /**
      * 1.处理了销毁时保存的问题;
      * 2.销毁后重新拉起服务.
      */
-    @Override
-    public void onDestroy() {
+    public void onEnd(Intent rootIntent) {
         //在onDestroy中取消订阅时，会执行Observable的doOnUnsubscribe(Runnable r)方法，我们在取消订阅时把数据保存到磁盘
         if (sSubscription != null) sSubscription.unsubscribe();
         //重新拉起服务
         startService(new Intent(this, getClass()));
     }
 
+    /**
+     * 最近任务列表中划掉卡片时回调
+     */
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return onStart(intent, flags, startId);
+    public void onTaskRemoved(Intent rootIntent) {
+        onEnd(rootIntent);
     }
 
+    /**
+     * 设置-正在运行中停止服务时回调
+     */
     @Override
-    public IBinder onBind(Intent intent) {
-        onStart(intent, 0, 0);
-        return null;
+    public void onDestroy() {
+        onEnd(null);
     }
 
     public static class WorkNotificationService extends Service {
