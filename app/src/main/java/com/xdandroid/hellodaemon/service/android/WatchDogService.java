@@ -12,6 +12,9 @@ public class WatchDogService extends Service {
 
     private static boolean sAlive;
 
+    /**
+     * 运行在 :watch 子进程中
+     */
     public int onStart(Intent intent, int flags, int startId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
             startService(new Intent(this, WatchDogNotificationService.class));
@@ -48,6 +51,9 @@ public class WatchDogService extends Service {
 
     public static class WatchDogNotificationService extends Service {
 
+        /**
+         * 运行在 :watch 子进程中
+         */
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
             startForeground(WatchDogService.sHashCode, new Notification());
