@@ -6,6 +6,7 @@ import android.os.*;
 import android.support.v7.app.*;
 
 import com.xdandroid.hellodaemon.receiver.*;
+import com.xdandroid.hellodaemon.service.android.*;
 
 import rx.*;
 import rx.schedulers.*;
@@ -16,17 +17,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Context app = getApplicationContext();
         //为防止优化软件禁用BroadcastReceiver组件，可以每次启动App都守护一下
         Observable.just(new Object())
                   //防止阻塞主线程
-                .subscribeOn(Schedulers.computation())
-                .subscribe(o -> {
-                    getPackageManager().setComponentEnabledSetting(
-                            new ComponentName(getPackageName(), WakeUpReceiver.class.getName()),
-                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                            PackageManager.DONT_KILL_APP);
-                }, Throwable::printStackTrace);
-        findViewById(R.id.btn_start).setOnClickListener(v -> sendBroadcast(new Intent(WakeUpReceiver.ACTION)));
+                  .subscribeOn(Schedulers.computation())
+                  .subscribe(o -> {
+                      app.getPackageManager().setComponentEnabledSetting(
+                              new ComponentName(app.getPackageName(), WakeUpReceiver.class.getName()),
+                              PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                              PackageManager.DONT_KILL_APP);
+                  }, Throwable::printStackTrace);
+        findViewById(R.id.btn_start).setOnClickListener(v -> {
+            app.startService(new Intent(app, WorkService.class));
+            app.startService(new Intent(app, WatchDogService.class));
+        });
     }
 
     /**
@@ -45,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sendBroadcast(new Intent(WakeUpReceiver.ACTION));
+        Context app = getApplicationContext();
+        app.startService(new Intent(app, WorkService.class));
+        app.startService(new Intent(app, WatchDogService.class));
     }
 }

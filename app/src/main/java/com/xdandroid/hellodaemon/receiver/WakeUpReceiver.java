@@ -15,8 +15,9 @@ public class WakeUpReceiver extends BroadcastReceiver {
      * 运行在 :work 子进程中
      */
     @Override
-    public void onReceive(Context context, Intent intent) {
-        context.startService(new Intent(context, WorkService.class));
-        context.startService(new Intent(context, WatchDogService.class));
+    public void onReceive(Context receiverRestrictedContext, Intent intent) {
+        Context app = receiverRestrictedContext.getApplicationContext();
+        app.startService(new Intent(app, WorkService.class));
+        app.startService(new Intent(app, WatchDogService.class));
     }
 }

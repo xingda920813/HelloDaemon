@@ -16,17 +16,18 @@ public class WatchDogService extends Service {
      * 运行在 :watch 子进程中
      */
     public int onStart(Intent intent, int flags, int startId) {
+        Context app = getApplicationContext();
         startForeground(sHashCode, new Notification());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-            startService(new Intent(this, WatchDogNotificationService.class));
+            app.startService(new Intent(app, WatchDogNotificationService.class));
 
         if (sAlive) return START_STICKY;
 
         sAlive = true;
 
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) app.getSystemService(ALARM_SERVICE);
         Intent i = new Intent(WakeUpReceiver.ACTION);
-        PendingIntent pi = PendingIntent.getBroadcast(this, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(app, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5 * 60 * 1000, pi);
 
         return START_STICKY;
@@ -49,7 +50,9 @@ public class WatchDogService extends Service {
     public void onEnd(Intent rootIntent) {
         sAlive = false;
         //重新拉起服务
-        sendBroadcast(new Intent(WakeUpReceiver.ACTION));
+        Context app = getApplicationContext();
+        app.startService(new Intent(app, WorkService.class));
+        app.startService(new Intent(app, WatchDogService.class));
     }
 
     /**

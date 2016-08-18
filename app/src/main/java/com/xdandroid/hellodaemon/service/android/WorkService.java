@@ -35,11 +35,12 @@ public class WorkService extends Service {
      * @return START_STICKY
      */
     public int onStart(Intent intent, int flags, int startId) {
+        Context app = getApplicationContext();
         //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
         startForeground(sHashCode, new Notification());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
             //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
-            startService(new Intent(this, WorkNotificationService.class));
+            app.startService(new Intent(app, WorkNotificationService.class));
 
         //若还没有取消订阅，说明任务仍在运行，为防止重复启动，直接返回START_STICKY
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
@@ -62,15 +63,15 @@ public class WorkService extends Service {
                 });
         //----------业务逻辑----------
 
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) app.getSystemService(ALARM_SERVICE);
         Intent i = new Intent(WakeUpReceiver.ACTION);
-        PendingIntent pi = PendingIntent.getBroadcast(this, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getBroadcast(app, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
         //设置闹钟 : 每 5 分钟检查一次服务是否在运行，如果不在运行就拉起来
         am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5 * 60 * 1000, pi);
 
         //简单守护开机广播
-        getPackageManager().setComponentEnabledSetting(
-                new ComponentName(getPackageName(), WakeUpReceiver.class.getName()),
+        app.getPackageManager().setComponentEnabledSetting(
+                new ComponentName(app.getPackageName(), WakeUpReceiver.class.getName()),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
 
@@ -99,7 +100,9 @@ public class WorkService extends Service {
         //在onDestroy中取消订阅时，会执行Observable的doOnUnsubscribe(Runnable r)方法，我们在取消订阅时把数据保存到磁盘
         if (sSubscription != null) sSubscription.unsubscribe();
         //重新拉起服务
-        sendBroadcast(new Intent(WakeUpReceiver.ACTION));
+        Context app = getApplicationContext();
+        app.startService(new Intent(app, WorkService.class));
+        app.startService(new Intent(app, WatchDogService.class));
     }
 
     /**

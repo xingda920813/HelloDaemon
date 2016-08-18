@@ -55,6 +55,14 @@
 
 因此，重写了Activity.onDestroy，重新拉起服务；重写了Service.onTaskRemoved，使其跟Service.onDestroy的逻辑一样 : 取消对任务的订阅，然后重新拉起服务。
 
+测试机型 : 红米 1S 4G, 神隐模式开启.
+
+应用未加入白名单的情况下，不在最近任务列表中划掉卡片或点击全部清理，服务可一直存活；划掉卡片或点击全部清理，服务会死掉并不再重启。
+
+应用加入白名单的情况下，划掉卡片或点击全部清理，服务会销毁并重新启动起来。
+
+建议加入引导页来引导用户加入MIUI的自启动白名单。
+
 #### \+ 双Service双进程守护
 
 #### \+ WorkService和WakeUpReceiver在:work子进程中运行，WatchDogService在:watch子进程中运行，与包含UI界面的主进程分离，更不容易被杀
