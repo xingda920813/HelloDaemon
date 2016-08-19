@@ -20,13 +20,17 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receiver.WakeUpReceiver">
+        <receiver
+            android:name=".receiver.WakeUpReceiver"
+            android:process=":watch">
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.WakeUpReceiver$WakeUpAutoStartReceiver">
+        <receiver
+            android:name=".receiver.WakeUpReceiver$WakeUpAutoStartReceiver"
+            android:process=":watch">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
