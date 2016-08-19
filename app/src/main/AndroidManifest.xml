@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.xdandroid.hellodaemon">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.xdandroid.hellodaemon">
 
-    <!-- BOOT_COMPLETED 需要的权限 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <!-- CONNECTIVITY_CHANGE 需要的权限 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
@@ -21,35 +20,22 @@
             </intent-filter>
         </activity>
 
-        <!-- 监听 3 种系统广播 : BOOT_COMPLETED, CONNECTIVITY_CHANGE, USER_PRESENT -->
-        <!-- 在系统启动完成、网络连接改变、用户屏幕解锁时拉起 Service -->
-        <!-- Service 内部做了判断，若 Service 已在运行，不会重复启动 -->
-        <receiver
-            android:name=".receiver.WakeUpReceiver"
-            android:process=":work">
+        <receiver android:name=".receiver.WakeUpReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
                 <action android:name="android.intent.action.USER_PRESENT"/>
-                <action android:name="com.xdandroid.hellodaemon.WAKE_UP"/>
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".service.android.WorkService"
-            android:process=":work"/>
+        <receiver android:name=".receiver.WakeUpReceiver$WakeUpAutoStartReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
 
-        <service
-            android:name=".service.android.WorkService$WorkNotificationService"
-            android:process=":work"/>
+        <service android:name=".service.WorkService"/>
 
-        <service
-            android:name=".service.android.WatchDogService"
-            android:process=":watch"/>
-
-        <service
-            android:name=".service.android.WatchDogService$WatchDogNotificationService"
-            android:process=":watch"/>
+        <service android:name=".service.WorkService$WorkNotificationService"/>
 
     </application>
 

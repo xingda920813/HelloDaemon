@@ -1,0 +1,77 @@
+package com.xdandroid.hellodaemon.service;
+
+import android.app.*;
+import android.app.Notification;
+import android.content.*;
+import android.os.*;
+
+import java.util.concurrent.*;
+
+import rx.*;
+
+public class WorkService extends Service {
+
+    private static final int sHashCode = WorkService.class.getName().hashCode();
+
+    public static Subscription sSubscription;
+
+    /**
+     * 1.防止重复启动，可以任意调用startService(Intent i);
+     * 2.利用漏洞启动前台服务而不显示通知;
+     * 3.在子线程中运行定时任务，处理了运行前检查和销毁时保存的问题;
+     */
+    private int onStart(Intent intent, int flags, int startId) {
+        //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
+        startForeground(sHashCode, new Notification());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
+            startService(new Intent(this, WorkNotificationService.class));
+        }
+
+        //若还没有取消订阅，说明任务仍在运行，为防止重复启动，直接返回START_STICKY
+        if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
+
+        //----------业务逻辑----------
+        System.out.println("检查磁盘中是否有上次销毁时保存的数据");
+        sSubscription = Observable
+                .interval(3, TimeUnit.SECONDS)
+                .subscribe(count -> {
+                    System.out.println("每 3 秒采集一次数据... count = " + count);
+                    if (count > 0 && count % 18 == 0) {
+                        System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
+                    }
+                });
+        //----------业务逻辑----------
+
+        return START_STICKY;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return onStart(intent, flags, startId);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        onStart(intent, 0, 0);
+        return null;
+    }
+
+    public static class WorkNotificationService extends Service {
+
+        /**
+         * 利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
+         */
+        @Override
+        public int onStartCommand(Intent intent, int flags, int startId) {
+            startForeground(WorkService.sHashCode, new Notification());
+            stopSelf();
+            return START_STICKY;
+        }
+
+        @Override
+        public IBinder onBind(Intent intent) {
+            return null;
+        }
+    }
+}
