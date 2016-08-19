@@ -10,8 +10,6 @@ public class WatchDogService extends Service {
 
     private static boolean sAlive;
 
-    private static final int sInterval = 5 * 60 * 1000;
-
     /**
      * 守护服务，运行在:watch子进程中
      */
@@ -25,11 +23,14 @@ public class WatchDogService extends Service {
 
         sAlive = true;
 
-        //每 5 分钟检查一次WorkService是否在运行，如果不在运行就把它拉起来
+        //每 15 分钟检查一次WorkService是否在运行，如果不在运行就把它拉起来
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent i = new Intent(this, WorkService.class);
         PendingIntent pi = PendingIntent.getService(this, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + sInterval, sInterval, pi);
+        am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                pi);
 
         return START_STICKY;
     }
