@@ -37,6 +37,14 @@
 
         <service android:name=".service.WorkService$WorkNotificationService"/>
 
+        <service
+            android:name=".service.WatchDogService"
+            android:process=":watch"/>
+
+        <service
+            android:name=".service.WatchDogService$WatchDogNotificationService"
+            android:process=":watch"/>
+
     </application>
 
 </manifest>
