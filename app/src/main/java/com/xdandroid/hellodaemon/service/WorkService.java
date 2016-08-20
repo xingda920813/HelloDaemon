@@ -76,6 +76,7 @@ public class WorkService extends Service {
     }
 
     private void onEnd(Intent rootIntent) {
+        System.out.println("保存数据到磁盘。");
         startService(new Intent(this, WorkService.class));
         startService(new Intent(this, WatchDogService.class));
     }
