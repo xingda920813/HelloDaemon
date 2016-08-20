@@ -11,15 +11,15 @@
 
 #### 1、将Service设置为前台服务而不显示通知
 
-> D-clock : 
-> 
+> D-clock :
+>
 思路一：API < 18，启动前台Service时直接传入new Notification()；
-> 
+>
 思路二：API >= 18，同时启动两个id相同的前台Service，然后再将后启动的Service做stop处理；
 
 #### 2.在 Service 的 onStartCommand 方法里返回 START_STICKY
 
-#### 3.覆盖 Service 的 onDestroy/onTaskRemoved 方法, 重新拉起服务
+#### 3.覆盖 Service 的 onDestroy/onTaskRemoved 方法, 保存数据到磁盘, 然后重新拉起服务
 
 #### 4.监听 3 种系统广播 : BOOT\_COMPLETED, CONNECTIVITY\_CHANGE, USER\_PRESENT
 
@@ -39,11 +39,11 @@ Service 内部做了判断，若 Service 已在运行，不会重复启动。
 
 测试机型 : 华为 荣耀6 Plus, 应用未加入白名单.
 
-> 
+>
 观察到 :
-> 
+>
 在未加入白名单的情况下，按Back键回到桌面再锁屏后几秒钟即会杀掉进程；
-> 
+>
 但是按Home键返回桌面的话，即使锁屏，也不会杀掉进程。
 
 因此，重写了onBackPressed方法，使其只是返回到桌面，而不是将当前Activity finish/destroy掉。
@@ -63,4 +63,3 @@ Service 内部做了判断，若 Service 已在运行，不会重复启动。
 开始任务前，先检查磁盘中是否有上次销毁时保存的数据；定期将数据保存到磁盘。
 
 详见代码及注释。
-
