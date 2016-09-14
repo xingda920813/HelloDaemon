@@ -3,23 +3,19 @@ package com.xdandroid.hellodaemon;
 import android.app.*;
 import android.content.*;
 import android.os.*;
-import android.support.design.widget.*;
-import android.support.v7.app.*;
-import android.support.v7.app.AlertDialog;
 import android.view.*;
+import android.widget.*;
 
 import com.xdandroid.hellodaemon.service.*;
 import com.xdandroid.hellodaemon.util.*;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     
-    //正式发布的App中不要这样做. Context对象存储在static变量中会造成内存泄露.
     public static Application sApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //正式发布的App中不要这样做. Context对象存储在static变量中会造成内存泄露.
         sApp = getApplication();
         setContentView(R.layout.activity_main);
         findViewById(R.id.btn_start).setOnClickListener(v -> startService(new Intent(this, WorkService.class)));
@@ -77,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         }
-        if (nothingMatches) Snackbar.make(v, "不是对应的机型", Snackbar.LENGTH_INDEFINITE).show();
+        if (nothingMatches) Toast.makeText(this, "不是对应的机型", Toast.LENGTH_SHORT).show();
     }
 
     /**
