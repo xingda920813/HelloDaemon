@@ -21,6 +21,10 @@ public class IntentWrapper {
     public static final int XIAOMI_GOD = 102;
     //三星 5.0+ 智能管理器
     public static final int SAMSUNG = 103;
+    //魅族 自启动管理
+    public static final int MEIZU = 104;
+    //魅族 待机耗电管理
+    public static final int MEIZU_GOD = 105;
 
     public static final List<IntentWrapper> sIntentWrapperList;
 
@@ -29,7 +33,6 @@ public class IntentWrapper {
 
         //华为 受保护的应用
         Intent huaweiIntent = new Intent();
-        huaweiIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         huaweiIntent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"));
         sIntentWrapperList.add(new IntentWrapper(huaweiIntent, IntentWrapper.HUAWEI));
 
@@ -47,6 +50,17 @@ public class IntentWrapper {
         //三星 5.0+ 智能管理器
         Intent samsungIntent = MainActivity.sApp.getPackageManager().getLaunchIntentForPackage("com.samsung.android.sm");
         if (samsungIntent != null) sIntentWrapperList.add(new IntentWrapper(samsungIntent, IntentWrapper.SAMSUNG));
+
+        //魅族 自启动管理
+        Intent meizuIntent = new Intent("com.meizu.safe.security.SHOW_APPSEC");
+        meizuIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        meizuIntent.putExtra("packageName", MainActivity.sApp.getPackageName());
+        sIntentWrapperList.add(new IntentWrapper(meizuIntent, IntentWrapper.MEIZU));
+
+        //魅族 待机耗电管理
+        Intent meizuGodIntent = new Intent();
+        meizuGodIntent.setComponent(new ComponentName("com.meizu.safe", "com.meizu.safe.powerui.AppPowerManagerActivity"));
+        sIntentWrapperList.add(new IntentWrapper(meizuGodIntent, IntentWrapper.MEIZU_GOD));
     }
 
     private IntentWrapper(Intent intent, int type) {

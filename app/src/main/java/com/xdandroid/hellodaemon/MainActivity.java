@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
                     nothingMatches = false;
                     new AlertDialog.Builder(this)
                             .setCancelable(false)
-                            .setTitle("需要加入受保护的应用名单")
+                            .setTitle("HelloDaemon 需要加入受保护的应用名单")
                             .setMessage("轨迹跟踪服务的后台运行需要 HelloDaemon 加入到受保护的应用名单。\n\n" +
                                     "请点击『确定』，在弹出的受保护应用列表中，将 HelloDaemon 对应的开关打开。")
                             .setPositiveButton("确定", (dialog, which) -> intentWrapper.startActivity(this))
@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
                     nothingMatches = false;
                     new AlertDialog.Builder(this)
                             .setCancelable(false)
-                            .setTitle("需要加入自启动白名单")
+                            .setTitle("HelloDaemon 需要加入自启动白名单")
                             .setMessage("轨迹跟踪服务的后台运行需要 HelloDaemon 加入到自启动白名单。\n\n" +
                                     "请点击『确定』，在弹出的自启动管理界面中，将 HelloDaemon 对应的开关打开。")
                             .setPositiveButton("确定", (dialog, which) -> intentWrapper.startActivity(this))
@@ -68,6 +68,26 @@ public class MainActivity extends Activity {
                             .setTitle("需要允许 HelloDaemon 的自启动")
                             .setMessage("轨迹跟踪服务的后台运行需要 HelloDaemon 在屏幕关闭时继续运行。\n\n" +
                                     "请点击『确定』，在弹出的 智能管理器 中，点击『内存』，选择『自启动应用程序』选项卡，将 HelloDaemon 对应的开关打开。")
+                            .setPositiveButton("确定", (dialog, which) -> intentWrapper.startActivity(this))
+                            .show();
+                    break;
+                case IntentWrapper.MEIZU:
+                    nothingMatches = false;
+                    new AlertDialog.Builder(this)
+                            .setCancelable(false)
+                            .setTitle("需要允许 HelloDaemon 的自启动")
+                            .setMessage("轨迹跟踪服务的后台运行需要允许 HelloDaemon 的自启动。\n\n" +
+                                    "请点击『确定』，在弹出的应用信息界面中，将『自启动』开关打开。")
+                            .setPositiveButton("确定", (dialog, which) -> intentWrapper.startActivity(this))
+                            .show();
+                    break;
+                case IntentWrapper.MEIZU_GOD:
+                    nothingMatches = false;
+                    new AlertDialog.Builder(this)
+                            .setCancelable(false)
+                            .setTitle("HelloDaemon 需要在待机时保持运行")
+                            .setMessage("轨迹跟踪服务的后台运行需要 HelloDaemon 在待机时保持运行。\n\n" +
+                                    "请点击『确定』，在弹出的『待机耗电管理』中，将 HelloDaemon 对应的开关打开。")
                             .setPositiveButton("确定", (dialog, which) -> intentWrapper.startActivity(this))
                             .show();
                     break;
