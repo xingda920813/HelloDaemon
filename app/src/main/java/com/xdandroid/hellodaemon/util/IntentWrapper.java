@@ -33,6 +33,12 @@ public class IntentWrapper {
     public static final int MEIZU = 104;
     //魅族 待机耗电管理
     public static final int MEIZU_GOD = 105;
+    //Oppo 自启动管理
+    public static final int OPPO = 106;
+    //Oppo 纯净后台应用管控
+    public static final int OPPO_GOD = 107;
+    //Vivo 后台高耗电
+    public static final int VIVO_GOD = 109;
 
     public static final List<IntentWrapper> sIntentWrapperList;
 
@@ -90,6 +96,21 @@ public class IntentWrapper {
         Intent meizuGodIntent = new Intent();
         meizuGodIntent.setComponent(new ComponentName("com.meizu.safe", "com.meizu.safe.powerui.AppPowerManagerActivity"));
         sIntentWrapperList.add(new IntentWrapper(meizuGodIntent, IntentWrapper.MEIZU_GOD));
+
+        //Oppo 自启动管理
+        Intent oppoIntent = new Intent();
+        oppoIntent.setComponent(new ComponentName("com.color.safecenter", "com.color.safecenter.permission.startup.StartupAppListActivity"));
+        sIntentWrapperList.add(new IntentWrapper(oppoIntent, IntentWrapper.OPPO));
+
+        //Oppo 纯净后台应用管控
+        Intent oppoGodIntent = new Intent();
+        oppoGodIntent.setComponent(new ComponentName("com.color.safecenter", "com.color.purebackground.PureBackgroundSettingActivity"));
+        sIntentWrapperList.add(new IntentWrapper(oppoGodIntent, IntentWrapper.OPPO_GOD));
+
+        //Vivo 后台高耗电
+        Intent vivoGodIntent = new Intent();
+        vivoGodIntent.setComponent(new ComponentName("com.vivo.abe", "com.vivo.applicationbehaviorengine.ui.ExcessivePowerManagerActivity"));
+        sIntentWrapperList.add(new IntentWrapper(vivoGodIntent, IntentWrapper.VIVO_GOD));
     }
 
     private IntentWrapper(Intent intent, int type) {
@@ -107,7 +128,7 @@ public class IntentWrapper {
     public void startActivity(Context context) {
         try {
             context.startActivity(intent);
-        } catch (ActivityNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
