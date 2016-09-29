@@ -2,7 +2,10 @@ package com.xdandroid.hellodaemon.service;
 
 import android.app.*;
 import android.content.*;
+import android.content.pm.*;
 import android.os.*;
+
+import com.xdandroid.hellodaemon.receiver.*;
 
 public class WatchDogService extends Service {
 
@@ -23,14 +26,24 @@ public class WatchDogService extends Service {
 
         sAlive = true;
 
-        //每 15 分钟检查一次WorkService是否在运行，如果不在运行就把它拉起来
+        //每 9 分钟检查一次WorkService是否在运行，如果不在运行就把它拉起来
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent i = new Intent(this, WorkService.class);
         PendingIntent pi = PendingIntent.getService(this, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+        am.setRepeating(AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + 9 * 60 * 1000,
+                9 * 60 * 1000,
                 pi);
+
+        //简单守护开机广播
+        getPackageManager().setComponentEnabledSetting(
+                new ComponentName(getPackageName(), WakeUpReceiver.class.getName()),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+        getPackageManager().setComponentEnabledSetting(
+                new ComponentName(getPackageName(), WakeUpReceiver.WakeUpAutoStartReceiver.class.getName()),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
 
         return START_STICKY;
     }

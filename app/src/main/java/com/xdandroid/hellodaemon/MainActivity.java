@@ -10,7 +10,7 @@ import com.xdandroid.hellodaemon.service.*;
 import com.xdandroid.hellodaemon.util.*;
 
 public class MainActivity extends Activity {
-    
+
     public static Application sApp;
 
     @Override
@@ -31,7 +31,31 @@ public class MainActivity extends Activity {
             //如果本机上没有能处理这个Intent的Activity，说明不是对应的机型，直接忽略进入下一次循环。
             if (!intentWrapper.doesActivityExists(this)) continue;
             switch (intentWrapper.type) {
+                case IntentWrapper.DOZE:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+                        if (pm.isIgnoringBatteryOptimizations(getPackageName())) break;
+                        nothingMatches = false;
+                        new AlertDialog.Builder(this)
+                                .setCancelable(false)
+                                .setTitle("需要忽略 HelloDaemon 的的电池优化")
+                                .setMessage("轨迹跟踪服务的后台运行需要 HelloDaemon 加入到电池优化的忽略名单。\n\n" +
+                                        "请点击『确定』，在弹出的『忽略电池优化』对话框中，选择『是』。")
+                                .setPositiveButton("确定", (dialog, which) -> intentWrapper.startActivity(this))
+                                .show();
+                    }
+                    break;
                 case IntentWrapper.HUAWEI:
+                    nothingMatches = false;
+                    new AlertDialog.Builder(this)
+                            .setCancelable(false)
+                            .setTitle("需要允许 HelloDaemon 自动启动")
+                            .setMessage("轨迹跟踪服务的后台运行需要允许 HelloDaemon 的后台自动启动。\n\n" +
+                                    "请点击『确定』，在弹出的自动启动管理页面中，将 HelloDaemon 对应的开关打开。")
+                            .setPositiveButton("确定", (dialog, which) -> intentWrapper.startActivity(this))
+                            .show();
+                    break;
+                case IntentWrapper.HUAWEI_GOD:
                     nothingMatches = false;
                     new AlertDialog.Builder(this)
                             .setCancelable(false)

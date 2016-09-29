@@ -1,7 +1,11 @@
 package com.xdandroid.hellodaemon.util;
 
+import android.app.*;
 import android.content.*;
 import android.content.pm.*;
+import android.net.*;
+import android.os.*;
+import android.provider.*;
 
 import com.xdandroid.hellodaemon.*;
 
@@ -13,8 +17,12 @@ import java.util.*;
 
 public class IntentWrapper {
 
+    //Android 6.0+ Doze 模式
+    public static final int DOZE = 98;
+    //华为 自启动管理
+    public static final int HUAWEI = 99;
     //华为 受保护的应用
-    public static final int HUAWEI = 100;
+    public static final int HUAWEI_GOD = 100;
     //小米 自启动管理
     public static final int XIAOMI = 101;
     //小米 神隐模式 (建议只在 App 的核心功能需要后台连接网络/后台定位的情况下使用)
@@ -28,13 +36,34 @@ public class IntentWrapper {
 
     public static final List<IntentWrapper> sIntentWrapperList;
 
+    private static final Application sApp;
+
     static {
+
+        sApp = MainActivity.sApp;
+
         sIntentWrapperList = new ArrayList<>();
 
-        //华为 受保护的应用
+        //Android 6.0+ Doze 模式
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PowerManager pm = (PowerManager) sApp.getSystemService(Context.POWER_SERVICE);
+            boolean ignoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(sApp.getPackageName());
+            if (!ignoringBatteryOptimizations) {
+                Intent dozeIntent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                dozeIntent.setData(Uri.parse("package:" + sApp.getPackageName()));
+                sIntentWrapperList.add(new IntentWrapper(dozeIntent, IntentWrapper.DOZE));
+            }
+        }
+
+        //华为 自启动管理
         Intent huaweiIntent = new Intent();
-        huaweiIntent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"));
+        huaweiIntent.setAction("huawei.intent.action.HSM_BOOTAPP_MANAGER");
         sIntentWrapperList.add(new IntentWrapper(huaweiIntent, IntentWrapper.HUAWEI));
+
+        //华为 受保护的应用
+        Intent huaweiGodIntent = new Intent();
+        huaweiGodIntent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"));
+        sIntentWrapperList.add(new IntentWrapper(huaweiGodIntent, IntentWrapper.HUAWEI_GOD));
 
         //小米 自启动管理
         Intent xiaomiIntent = new Intent();
