@@ -78,7 +78,7 @@ public class IntentWrapper {
 
         //华为 自启动管理
         Intent huaweiIntent = new Intent();
-        huaweiIntent.setAction("huawei.mIntent.action.HSM_BOOTAPP_MANAGER");
+        huaweiIntent.setAction("huawei.intent.action.HSM_BOOTAPP_MANAGER");
         sIntentWrapperList.add(new IntentWrapper(huaweiIntent, HUAWEI));
 
         //华为 受保护的应用
@@ -88,7 +88,7 @@ public class IntentWrapper {
 
         //小米 自启动管理
         Intent xiaomiIntent = new Intent();
-        xiaomiIntent.setAction("miui.mIntent.action.OP_AUTO_START");
+        xiaomiIntent.setAction("miui.intent.action.OP_AUTO_START");
         xiaomiIntent.addCategory(Intent.CATEGORY_DEFAULT);
         sIntentWrapperList.add(new IntentWrapper(xiaomiIntent, XIAOMI));
 
