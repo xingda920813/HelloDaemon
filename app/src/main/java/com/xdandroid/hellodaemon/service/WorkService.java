@@ -23,11 +23,14 @@ public class WorkService extends Service {
      * 5.简单守护开机广播.
      */
     private int onStart(Intent intent, int flags, int startId) {
-        //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
-        startForeground(sHashCode, new Notification());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
-            startService(new Intent(this, WorkNotificationService.class));
+        //启动前台服务而不显示通知的漏洞在 API Level 25 已修复，大快人心！
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+            //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
+            startForeground(sHashCode, new Notification());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
+                startService(new Intent(this, WorkNotificationService.class));
+            }
         }
 
         //启动守护服务，运行在:watch子进程中

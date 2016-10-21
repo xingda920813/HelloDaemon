@@ -1,7 +1,7 @@
 # HelloDaemon
 ### Android 服务保活/常驻 (Android Service Daemon)
 
-#### 建议只在App的核心功能需要保活/常驻时使用
+#### 建议只在App的核心功能需要保活/常驻时使用。
 
 #### 本示例中使用的保活方法部分来源于下面的博客和库。启动前台服务而不显示通知来自于D-clock的AndroidDaemonService，对其他的一些非native层保活方法进行了实现。
 
@@ -18,6 +18,8 @@
 思路一：API < 18，启动前台Service时直接传入new Notification()；
 >   
 思路二：API >= 18，同时启动两个id相同的前台Service，然后再将后启动的Service做stop处理；
+
+//启动前台服务而不显示通知的漏洞在 API Level 25 已修复，大快人心！
 
 前台服务相对于后台服务的优势，除了优先级的提升以外，还有一点：
 

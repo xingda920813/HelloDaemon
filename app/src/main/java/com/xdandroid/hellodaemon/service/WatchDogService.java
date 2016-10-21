@@ -17,9 +17,12 @@ public class WatchDogService extends Service {
      * 守护服务，运行在:watch子进程中
      */
     private int onStart(Intent intent, int flags, int startId) {
-        startForeground(sHashCode, new Notification());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            startService(new Intent(this, WatchDogNotificationService.class));
+        //启动前台服务而不显示通知的漏洞在 API Level 25 已修复，大快人心！
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+            startForeground(sHashCode, new Notification());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                startService(new Intent(this, WatchDogNotificationService.class));
+            }
         }
 
         if (sAlive) return START_STICKY;
