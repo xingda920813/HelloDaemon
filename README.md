@@ -29,6 +29,10 @@
 
 而后台服务会停止，并在稍后重新启动（onStartCommand 返回 START_STICKY 时）。
 
+前台服务和后台服务被划掉卡片时，回调的都是 onTaskRemoved 方法。
+
+onDestroy 方法只在 设置 -> 开发者选项 -> 正在运行的服务 里停止服务时才会回调。
+
 #### 2.在 Service 的 onStartCommand 方法里返回 START_STICKY
 
 #### 3.覆盖 Service 的 onDestroy/onTaskRemoved 方法, 保存数据到磁盘, 然后重新拉起服务
