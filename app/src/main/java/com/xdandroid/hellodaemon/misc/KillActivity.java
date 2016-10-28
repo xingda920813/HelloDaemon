@@ -1,4 +1,4 @@
-package com.xdandroid.hellodaemon;
+package com.xdandroid.hellodaemon.misc;
 
 import android.app.*;
 import android.content.pm.*;
@@ -20,17 +20,13 @@ public class KillActivity extends Activity {
             try {
                 List<String> packageNames = new LinkedList<>();
                 List<PackageInfo> installedPackages = getPackageManager().getInstalledPackages(0);
-                for (PackageInfo packageInfo : installedPackages) {
+                for (PackageInfo packageInfo : installedPackages)
                     if ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0 &&
-                            (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0) {
+                            (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
                         packageNames.add(packageInfo.packageName);
-                    }
-                }
                 Object am = getSystemService(ACTIVITY_SERVICE);
                 Method m = am.getClass().getMethod("forceStopPackage", String.class);
-                for (String packageName : packageNames) {
-                    m.invoke(am, packageName);
-                }
+                for (String packageName : packageNames) m.invoke(am, packageName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
