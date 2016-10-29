@@ -23,9 +23,9 @@ public class RevokeActivity extends Activity {
             List<PackageInfo> installedPackages = pm.getInstalledPackages(PackageManager.GET_PERMISSIONS);
             Class<AppOpsManager> aomClazz = AppOpsManager.class;
             AppOpsManager aom = getSystemService(aomClazz);
+            boolean nougat = true;
             try {
                 Method setUidModeMethod;
-                boolean nougat = true;
                 Method permissionToOpCodeMethod = null;
                 try {
                     setUidModeMethod = aomClazz.getMethod("setUidMode", String.class, int.class, int.class);
@@ -38,8 +38,8 @@ public class RevokeActivity extends Activity {
                     if ((pi.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 ||
                             (pi.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) continue;
                     if (pi.applicationInfo.targetSdkVersion >= Build.VERSION_CODES.M) continue;
-                    int uid = pi.applicationInfo.uid;
                     if (pi.requestedPermissions == null || pi.requestedPermissions.length <= 0) continue;
+                    int uid = pi.applicationInfo.uid;
                     for (String reqPermission : pi.requestedPermissions) {
                         PermissionInfo permissionInfo = null;
                         try {
