@@ -27,6 +27,7 @@ public class RevokeActivity extends Activity {
             try {
                 Method setUidModeMethod;
                 Method permissionToOpCodeMethod = null;
+                Method setModeMethod = aomClazz.getMethod("setMode", int.class, int.class, String.class, int.class);
                 try {
                     setUidModeMethod = aomClazz.getMethod("setUidMode", String.class, int.class, int.class);
                 } catch (Exception e) {
@@ -59,7 +60,6 @@ public class RevokeActivity extends Activity {
                             }
                         }
                     }
-                    Method setModeMethod = aomClazz.getMethod("setMode", int.class, int.class, String.class, int.class);
                     setModeMethod.invoke(aom, 24, uid, pi.applicationInfo.packageName, AppOpsManager.MODE_IGNORED);
                     setModeMethod.invoke(aom, 23, uid, pi.applicationInfo.packageName, AppOpsManager.MODE_IGNORED);
                 }
