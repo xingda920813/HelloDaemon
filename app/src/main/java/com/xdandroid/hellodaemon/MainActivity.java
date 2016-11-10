@@ -59,13 +59,14 @@ public class MainActivity extends Activity {
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
                             .show();
                     break;
+                case ZTE_GOD:
                 case HUAWEI_GOD:
                     nothingMatches = false;
                     new AlertDialog.Builder(this)
                             .setCancelable(false)
                             .setTitle("" + getApplicationName() + " 需要加入受保护的应用名单")
                             .setMessage("轨迹跟踪服务的持续运行需要 " + getApplicationName() + " 加入到受保护的应用名单。\n\n" +
-                                    "请点击『确定』，在弹出的受保护应用列表中，将 " + getApplicationName() + " 对应的开关打开。")
+                                    "请点击『确定』，在弹出的『受保护应用』列表中，将 " + getApplicationName() + " 对应的开关打开。")
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
                             .show();
                     break;
@@ -109,6 +110,7 @@ public class MainActivity extends Activity {
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
                             .show();
                     break;
+                case ZTE:
                 case LETV:
                 case XIAOMI:
                 case OPPO:

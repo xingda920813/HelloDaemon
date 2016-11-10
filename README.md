@@ -97,6 +97,8 @@ Service 内部做了判断，若 Service 已在运行，不会重复启动。
 - 酷派 自启动管理
 - 联想 后台管理
 - 联想 后台耗电优化
+- 中兴 自启管理
+- 中兴 锁屏加速受保护应用
 
 配合 android.support.v7.AlertDialog 引导用户将 App 加入白名单.
 

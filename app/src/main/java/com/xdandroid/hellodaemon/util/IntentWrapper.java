@@ -54,6 +54,10 @@ public class IntentWrapper {
     public static final int LENOVO = 114;
     //联想 后台耗电优化
     public static final int LENOVO_GOD = 115;
+    //中兴 自启管理
+    public static final int ZTE = 116;
+    //中兴 锁屏加速受保护应用
+    public static final int ZTE_GOD = 117;
 
     public static final List<IntentWrapper> sIntentWrapperList;
 
@@ -161,6 +165,16 @@ public class IntentWrapper {
         Intent lenovoGodIntent = new Intent();
         lenovoGodIntent.setComponent(new ComponentName("com.lenovo.powersetting", "com.lenovo.powersetting.ui.Settings$HighPowerApplicationsActivity"));
         sIntentWrapperList.add(new IntentWrapper(lenovoGodIntent, LENOVO_GOD));
+
+        //中兴 自启管理
+        Intent zteIntent = new Intent();
+        zteIntent.setComponent(new ComponentName("com.zte.heartyservice", "com.zte.heartyservice.autorun.AppAutoRunManager"));
+        sIntentWrapperList.add(new IntentWrapper(zteIntent, ZTE));
+
+        //中兴 锁屏加速受保护应用
+        Intent zteGodIntent = new Intent();
+        zteGodIntent.setComponent(new ComponentName("com.zte.heartyservice", "com.zte.heartyservice.setting.ClearAppSettingsActivity"));
+        sIntentWrapperList.add(new IntentWrapper(zteGodIntent, ZTE_GOD));
     }
 
     private IntentWrapper(Intent intent, int type) {
