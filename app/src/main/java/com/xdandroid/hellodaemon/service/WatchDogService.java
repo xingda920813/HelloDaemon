@@ -11,7 +11,7 @@ import com.xdandroid.hellodaemon.receiver.*;
 public class WatchDogService extends Service {
 
     private static final int sHashCode = WatchDogService.class.getName().hashCode();
-    private static final int INTERVAL_WAKE_UP = 3 * 60 * 1000;
+    private static final int INTERVAL_WAKE_UP = 6 * 60 * 1000;
 
     private static boolean sAlive;
 
@@ -29,7 +29,7 @@ public class WatchDogService extends Service {
 
         sAlive = true;
 
-        //每 3 分钟检查一次WorkService是否在运行，如果不在运行就把它拉起来
+        //定时检查 WorkService 是否在运行，如果不在运行就把它拉起来
         //Android 5.0+ 使用 JobScheduler，效果比 AlarmManager 好
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             JobInfo.Builder builder = new JobInfo.Builder(sHashCode, new ComponentName(getApplication(), JobSchedulerService.class));
