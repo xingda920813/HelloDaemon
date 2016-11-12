@@ -19,7 +19,7 @@ public class WatchDogService extends Service {
      * 守护服务，运行在:watch子进程中
      */
     private int onStart(Intent intent, int flags, int startId) {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
             startForeground(sHashCode, new Notification());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
                 startService(new Intent(getApplication(), WatchDogNotificationService.class));

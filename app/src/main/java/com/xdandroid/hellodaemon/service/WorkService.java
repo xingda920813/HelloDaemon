@@ -24,7 +24,7 @@ public class WorkService extends Service {
      */
     private int onStart(Intent intent, int flags, int startId) {
         //启动前台服务而不显示通知的漏洞已在 API Level 25 修复，大快人心！
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
             //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
             startForeground(sHashCode, new Notification());
             //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
