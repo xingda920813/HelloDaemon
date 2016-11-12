@@ -43,13 +43,19 @@ onDestroy 方法只在 设置 -> 开发者选项 -> 正在运行的服务 里停
 
 Service 内部做了判断，若 Service 已在运行，不会重复启动。
 
-#### 5.开启守护服务 : 每 9 分钟检查一次服务是否在运行，如果不在运行就拉起来
+#### 5.开启守护服务 : 定时检查服务是否在运行，如果不在运行就拉起来
 
 #### 6.简单守护开机广播
 
 详见上面的 2 个链接。
 
 ## 增加实现 :
+
+#### \+ 守护服务 : Android 5.0 及以上版本使用 JobScheduler，效果比 AlarmManager 好
+
+使用 JobScheduler, Android 系统能自动拉起被 Force Stop 的 Package，而 AlarmManager 无法拉起.
+
+Android 4.4 及以下版本使用 AlarmManager.
 
 #### \+ 增强对国产机型的适配 : 防止华为机型按返回键回到桌面再锁屏后几秒钟进程被杀
 

@@ -27,28 +27,28 @@ public class WorkService extends Service {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
             startForeground(sHashCode, new Notification());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
-                startService(new Intent(this, WorkNotificationService.class));
-            }
+            //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+                startService(new Intent(getApplication(), WorkNotificationService.class));
         }
 
         //启动守护服务，运行在:watch子进程中
-        startService(new Intent(this, WatchDogService.class));
+        startService(new Intent(getApplication(), WatchDogService.class));
+
+        //----------业务逻辑----------
 
         //若还没有取消订阅，说明任务仍在运行，为防止重复启动，直接返回START_STICKY
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
 
-        //----------业务逻辑----------
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
         sSubscription = Observable
                 .interval(3, TimeUnit.SECONDS)
                 .subscribe(count -> {
                     System.out.println("每 3 秒采集一次数据... count = " + count);
-                    if (count > 0 && count % 18 == 0) {
+                    if (count > 0 && count % 18 == 0)
                         System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
-                    }
                 });
+
         //----------业务逻辑----------
 
         return START_STICKY;
@@ -67,8 +67,8 @@ public class WorkService extends Service {
 
     private void onEnd(Intent rootIntent) {
         System.out.println("保存数据到磁盘。");
-        startService(new Intent(this, WorkService.class));
-        startService(new Intent(this, WatchDogService.class));
+        startService(new Intent(getApplication(), WorkService.class));
+        startService(new Intent(getApplication(), WatchDogService.class));
     }
 
     /**

@@ -42,6 +42,13 @@
         <service android:name=".service.WorkService$WorkNotificationService"/>
 
         <service
+            android:name=".service.JobSchedulerService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":watch"/>
+
+        <service
             android:name=".service.WatchDogService"
             android:process=":watch"/>
 

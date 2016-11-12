@@ -1,6 +1,7 @@
 package com.xdandroid.hellodaemon.service;
 
 import android.app.*;
+import android.app.job.*;
 import android.content.*;
 import android.content.pm.*;
 import android.os.*;
@@ -10,6 +11,7 @@ import com.xdandroid.hellodaemon.receiver.*;
 public class WatchDogService extends Service {
 
     private static final int sHashCode = WatchDogService.class.getName().hashCode();
+    private static final int INTERVAL_WAKE_UP = 3 * 60 * 1000;
 
     private static boolean sAlive;
 
@@ -19,23 +21,32 @@ public class WatchDogService extends Service {
     private int onStart(Intent intent, int flags, int startId) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             startForeground(sHashCode, new Notification());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                startService(new Intent(this, WatchDogNotificationService.class));
-            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+                startService(new Intent(getApplication(), WatchDogNotificationService.class));
         }
 
         if (sAlive) return START_STICKY;
 
         sAlive = true;
 
-        //每 9 分钟检查一次WorkService是否在运行，如果不在运行就把它拉起来
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent i = new Intent(this, WorkService.class);
-        PendingIntent pi = PendingIntent.getService(this, sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setRepeating(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + 9 * 60 * 1000,
-                9 * 60 * 1000,
-                pi);
+        //每 3 分钟检查一次WorkService是否在运行，如果不在运行就把它拉起来
+        //Android 5.0+ 使用 JobScheduler，效果比 AlarmManager 好
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            JobInfo.Builder builder = new JobInfo.Builder(sHashCode, new ComponentName(getApplication(), JobSchedulerService.class));
+            builder.setPeriodic(INTERVAL_WAKE_UP);
+            //Android 7.0+ 增加了一项针对 JobScheduler 的新限制，最小间隔只能是下面设定的数字
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                builder.setPeriodic(JobInfo.getMinPeriodMillis(), JobInfo.getMinFlexMillis());
+            builder.setPersisted(true);
+            JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+            scheduler.schedule(builder.build());
+        } else {
+            //Android 4.4- 使用 AlarmManager
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent i = new Intent(getApplication(), WorkService.class);
+            PendingIntent pi = PendingIntent.getService(getApplication(), sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + INTERVAL_WAKE_UP, INTERVAL_WAKE_UP, pi);
+        }
 
         //简单守护开机广播
         getPackageManager().setComponentEnabledSetting(
@@ -62,8 +73,8 @@ public class WatchDogService extends Service {
     }
 
     private void onEnd(Intent rootIntent) {
-        startService(new Intent(this, WorkService.class));
-        startService(new Intent(this, WatchDogService.class));
+        startService(new Intent(getApplication(), WorkService.class));
+        startService(new Intent(getApplication(), WatchDogService.class));
     }
 
     /**
