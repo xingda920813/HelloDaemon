@@ -10,7 +10,7 @@ import com.xdandroid.hellodaemon.receiver.*;
 
 public class WatchDogService extends Service {
 
-    private static final int sHashCode = WatchDogService.class.getName().hashCode();
+    private static final int sHashCode = 2;
     private static final int INTERVAL_WAKE_UP = 6 * 60 * 1000;
 
     private static boolean sAlive;

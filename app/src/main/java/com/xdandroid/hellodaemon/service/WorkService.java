@@ -11,7 +11,7 @@ import rx.*;
 
 public class WorkService extends Service {
 
-    private static final int sHashCode = WorkService.class.getName().hashCode();
+    private static final int sHashCode = 1;
 
     public static Subscription sSubscription;
 
