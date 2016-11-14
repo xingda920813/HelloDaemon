@@ -15,7 +15,7 @@ public class JobSchedulerService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         startService(new Intent(getApplication(), WorkService.class));
-        jobFinished(params, true);
+        jobFinished(params, false);
         return false;
     }
 
