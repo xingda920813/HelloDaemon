@@ -1,6 +1,7 @@
 package com.xdandroid.hellodaemon.service;
 
 import android.app.*;
+import android.app.Notification;
 import android.app.job.*;
 import android.content.*;
 import android.content.pm.*;
@@ -8,12 +9,20 @@ import android.os.*;
 
 import com.xdandroid.hellodaemon.receiver.*;
 
+import java.util.concurrent.*;
+
+import rx.*;
+import rx.android.schedulers.*;
+import rx.schedulers.*;
+
 public class WatchDogService extends Service {
 
     private static final int sHashCode = 2;
     private static final int INTERVAL_WAKE_UP = 6 * 60 * 1000;
 
-    private static boolean sAlive;
+    private static Subscription sSubscription;
+
+    public static PowerManager.WakeLock sWakeLock;
 
     /**
      * 守护服务，运行在:watch子进程中
@@ -25,9 +34,7 @@ public class WatchDogService extends Service {
                 startService(new Intent(getApplication(), WatchDogNotificationService.class));
         }
 
-        if (sAlive) return START_STICKY;
-
-        sAlive = true;
+        if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
 
         //定时检查 WorkService 是否在运行，如果不在运行就把它拉起来
         //Android 5.0+ 使用 JobScheduler，效果比 AlarmManager 好
@@ -47,6 +54,24 @@ public class WatchDogService extends Service {
             PendingIntent pi = PendingIntent.getService(getApplication(), sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
             am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + INTERVAL_WAKE_UP, INTERVAL_WAKE_UP, pi);
         }
+
+        //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
+        sSubscription = Observable
+                .interval(INTERVAL_WAKE_UP, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> startService(new Intent(getApplication(), WorkService.class)), Throwable::printStackTrace);
+
+        //若需要防止 CPU 休眠，这里给出了 WakeLock 的参考实现
+        /*PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        sWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WatchDogService.class.getSimpleName());
+        sWakeLock.setReferenceCounted(false);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+        try {
+            getApplication().registerReceiver(WakeLockReceiver.getInstance(), intentFilter);
+        } catch (Exception ignored) {}*/
 
         //简单守护开机广播
         getPackageManager().setComponentEnabledSetting(
