@@ -63,8 +63,8 @@ public class WatchDogService extends Service {
                 .subscribe(aLong -> startService(new Intent(getApplication(), WorkService.class)), Throwable::printStackTrace);
 
         //若需要防止 CPU 休眠，这里给出了 WakeLock 的参考实现
-        /*PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        sWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WatchDogService.class.getSimpleName());
+        /*PowerManager pom = (PowerManager) getSystemService(POWER_SERVICE);
+        sWakeLock = pom.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WatchDogService.class.getSimpleName());
         sWakeLock.setReferenceCounted(false);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -75,11 +75,7 @@ public class WatchDogService extends Service {
 
         //简单守护开机广播
         getPackageManager().setComponentEnabledSetting(
-                new ComponentName(getPackageName(), WakeUpReceiver.class.getName()),
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
-        getPackageManager().setComponentEnabledSetting(
-                new ComponentName(getPackageName(), WakeUpReceiver.WakeUpAutoStartReceiver.class.getName()),
+                new ComponentName(getPackageName(), WorkService.class.getName()),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
 

@@ -3,6 +3,7 @@ package com.xdandroid.hellodaemon.service;
 import android.app.Notification;
 import android.app.*;
 import android.content.*;
+import android.content.pm.*;
 import android.os.*;
 
 import java.util.concurrent.*;
@@ -50,6 +51,11 @@ public class WorkService extends Service {
                 });
 
         //----------业务逻辑----------
+
+        getPackageManager().setComponentEnabledSetting(
+                new ComponentName(getPackageName(), WatchDogService.class.getName()),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
 
         return START_STICKY;
     }
