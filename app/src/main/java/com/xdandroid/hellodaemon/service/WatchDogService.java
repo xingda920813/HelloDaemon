@@ -69,6 +69,7 @@ public class WatchDogService extends Service {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+        intentFilter.addAction(Intent.ACTION_USER_PRESENT);
         try {
             getApplication().registerReceiver(WakeLockReceiver.getInstance(), intentFilter);
         } catch (Exception ignored) {}*/

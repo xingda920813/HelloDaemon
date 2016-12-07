@@ -32,6 +32,7 @@ public class WakeLockReceiver extends BroadcastReceiver {
                 try {if (!WatchDogService.sWakeLock.isHeld()) WatchDogService.sWakeLock.acquire();} catch (Exception ignored) {}
                 break;
             case Intent.ACTION_SCREEN_ON:
+            case Intent.ACTION_USER_PRESENT:
                 //点亮屏幕后释放 WakeLock
                 try {if (WatchDogService.sWakeLock.isHeld()) WatchDogService.sWakeLock.release();} catch (Exception ignored) {}
                 break;
