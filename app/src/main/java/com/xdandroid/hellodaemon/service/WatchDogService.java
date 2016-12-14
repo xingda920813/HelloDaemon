@@ -7,12 +7,10 @@ import android.content.*;
 import android.content.pm.*;
 import android.os.*;
 
-import com.xdandroid.hellodaemon.receiver.*;
 
 import java.util.concurrent.*;
 
 import rx.*;
-import rx.android.schedulers.*;
 import rx.schedulers.*;
 
 public class WatchDogService extends Service {
@@ -58,8 +56,6 @@ public class WatchDogService extends Service {
         //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
         sSubscription = Observable
                 .interval(INTERVAL_WAKE_UP, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> startService(new Intent(getApplication(), WorkService.class)), Throwable::printStackTrace);
 
         //若需要防止 CPU 休眠，这里给出了 WakeLock 的参考实现

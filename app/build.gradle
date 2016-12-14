@@ -19,5 +19,5 @@ android {
 }
 
 dependencies {
-    compile 'io.reactivex:rxandroid:+'
+    compile 'io.reactivex:rxjava:+'
 }
