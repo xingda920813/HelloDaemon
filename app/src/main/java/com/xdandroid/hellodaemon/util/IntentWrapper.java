@@ -8,9 +8,9 @@ import android.os.*;
 import android.provider.*;
 import android.text.*;
 
-import com.xdandroid.hellodaemon.*;
-
 import java.util.*;
+
+import static com.xdandroid.hellodaemon.MainActivity.sApp;
 
 /**
  * Created by xingda on 16-9-13.
@@ -61,11 +61,7 @@ public class IntentWrapper {
 
     public static final List<IntentWrapper> sIntentWrapperList;
 
-    private static final Application sApp;
-
     static {
-
-        sApp = MainActivity.sApp;
 
         sIntentWrapperList = new ArrayList<>();
 
@@ -177,12 +173,12 @@ public class IntentWrapper {
         sIntentWrapperList.add(new IntentWrapper(zteGodIntent, ZTE_GOD));
     }
 
-    private IntentWrapper(Intent intent, int type) {
+    IntentWrapper(Intent intent, int type) {
         mIntent = intent;
         mType = type;
     }
 
-    private Intent mIntent;
+    Intent mIntent;
     public int mType;
 
     /**
@@ -205,7 +201,7 @@ public class IntentWrapper {
         return list != null && list.size() > 0;
     }
 
-    private static String sApplicationName;
+    static String sApplicationName;
 
     public static String getApplicationName() {
         if (!TextUtils.isEmpty(sApplicationName)) return sApplicationName;

@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
     /**
      * 处理白名单
      */
-    private void whiteListMatters(View v) {
+    void whiteListMatters(View v) {
         boolean nothingMatches = true;
         for (IntentWrapper intentWrapper : sIntentWrapperList) {
             //如果本机上没有能处理这个Intent的Activity，说明不是对应的机型，直接忽略进入下一次循环。

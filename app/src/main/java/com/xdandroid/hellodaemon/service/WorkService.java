@@ -12,7 +12,7 @@ import rx.*;
 
 public class WorkService extends Service {
 
-    private static final int sHashCode = 1;
+    static final int sHashCode = 1;
 
     public static Subscription sSubscription;
 
@@ -23,7 +23,7 @@ public class WorkService extends Service {
      * 4.启动守护服务.
      * 5.简单守护开机广播.
      */
-    private int onStart(Intent intent, int flags, int startId) {
+    int onStart(Intent intent, int flags, int startId) {
         //启动前台服务而不显示通知的漏洞已在 API Level 25 修复，大快人心！
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
             //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
@@ -71,7 +71,7 @@ public class WorkService extends Service {
         return null;
     }
 
-    private void onEnd(Intent rootIntent) {
+    void onEnd(Intent rootIntent) {
         System.out.println("保存数据到磁盘。");
         startService(new Intent(getApplication(), WorkService.class));
         startService(new Intent(getApplication(), WatchDogService.class));

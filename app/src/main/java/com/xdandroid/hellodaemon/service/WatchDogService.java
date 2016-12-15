@@ -7,25 +7,26 @@ import android.content.*;
 import android.content.pm.*;
 import android.os.*;
 
-
 import java.util.concurrent.*;
 
 import rx.*;
-import rx.schedulers.*;
+
+import static com.xdandroid.hellodaemon.MainActivity.sApp;
 
 public class WatchDogService extends Service {
 
-    private static final int sHashCode = 2;
-    private static final int INTERVAL_WAKE_UP = 6 * 60 * 1000;
+    static final int sHashCode = 2;
+    static final int INTERVAL_WAKE_UP = 6 * 60 * 1000;
 
-    private static Subscription sSubscription;
+    static Subscription sSubscription;
+    static PendingIntent sPendingIntent;
 
     public static PowerManager.WakeLock sWakeLock;
 
     /**
      * 守护服务，运行在:watch子进程中
      */
-    private int onStart(Intent intent, int flags, int startId) {
+    int onStart(Intent intent, int flags, int startId) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
             startForeground(sHashCode, new Notification());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -49,8 +50,8 @@ public class WatchDogService extends Service {
             //Android 4.4- 使用 AlarmManager
             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent i = new Intent(getApplication(), WorkService.class);
-            PendingIntent pi = PendingIntent.getService(getApplication(), sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + INTERVAL_WAKE_UP, INTERVAL_WAKE_UP, pi);
+            sPendingIntent = PendingIntent.getService(getApplication(), sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + INTERVAL_WAKE_UP, INTERVAL_WAKE_UP, sPendingIntent);
         }
 
         //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
@@ -90,7 +91,7 @@ public class WatchDogService extends Service {
         return null;
     }
 
-    private void onEnd(Intent rootIntent) {
+    void onEnd(Intent rootIntent) {
         startService(new Intent(getApplication(), WorkService.class));
         startService(new Intent(getApplication(), WatchDogService.class));
     }
@@ -109,6 +110,20 @@ public class WatchDogService extends Service {
     @Override
     public void onDestroy() {
         onEnd(null);
+    }
+
+    /**
+     * 用于在不需要的时候取消 Job / Alarm / Subscription.
+     */
+    public static void cancelJobAlarmSub() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            JobScheduler scheduler = (JobScheduler) sApp.getSystemService(JOB_SCHEDULER_SERVICE);
+            scheduler.cancel(sHashCode);
+        } else {
+            AlarmManager am = (AlarmManager) sApp.getSystemService(ALARM_SERVICE);
+            if (sPendingIntent != null) am.cancel(sPendingIntent);
+        }
+        if (sSubscription != null) sSubscription.unsubscribe();
     }
 
     public static class WatchDogNotificationService extends Service {

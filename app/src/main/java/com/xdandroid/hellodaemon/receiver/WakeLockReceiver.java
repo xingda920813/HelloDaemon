@@ -4,13 +4,9 @@ import android.content.*;
 
 import com.xdandroid.hellodaemon.service.*;
 
-/**
- * Created by xingda on 16-11-16.
- */
-
 public class WakeLockReceiver extends BroadcastReceiver {
 
-    private static WakeLockReceiver sInstance;
+    static WakeLockReceiver sInstance;
 
     public static WakeLockReceiver getInstance() {
         if (sInstance == null) sInstance = new WakeLockReceiver();

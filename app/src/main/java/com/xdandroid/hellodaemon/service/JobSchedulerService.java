@@ -19,7 +19,7 @@ public class JobSchedulerService extends JobService {
         return false;
     }
 
-    private void onEnd(Intent rootIntent) {
+    void onEnd(Intent rootIntent) {
         startService(new Intent(getApplication(), WorkService.class));
         startService(new Intent(getApplication(), WatchDogService.class));
     }
