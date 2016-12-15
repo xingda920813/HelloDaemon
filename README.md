@@ -59,6 +59,8 @@ Android 4.4 及以下版本使用 AlarmManager.
 
 #### \+ 使用定时 Observable : 避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
 
+#### \+ 增加在不需要时取消 Job / Alarm / Subscription 的快捷方法.
+
 #### \+ 增强对国产机型的适配 : 防止华为机型按返回键回到桌面再锁屏后几秒钟进程被杀
 
 测试机型 : 华为 荣耀6 Plus (EMUI 3.0 Android 4.4.2), 应用未加入白名单.
