@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
             if (!intentWrapper.doesActivityExists()) continue;
             switch (intentWrapper.mType) {
                 case DOZE:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
                         if (pm.isIgnoringBatteryOptimizations(getPackageName())) break;
                         nothingMatches = false;
