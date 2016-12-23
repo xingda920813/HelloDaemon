@@ -66,7 +66,7 @@ public class IntentWrapper {
         sIntentWrapperList = new ArrayList<>();
 
         //Android 6.0+ Doze 模式
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             PowerManager pm = (PowerManager) sApp.getSystemService(Context.POWER_SERVICE);
             boolean ignoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(sApp.getPackageName());
             if (!ignoringBatteryOptimizations) {
