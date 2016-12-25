@@ -12,7 +12,7 @@ import rx.*;
 
 public class WorkService extends Service {
 
-    static final int sHashCode = 1;
+    static final int HASH_CODE = 1;
 
     public static Subscription sSubscription;
 
@@ -23,11 +23,11 @@ public class WorkService extends Service {
      * 4.启动守护服务.
      * 5.简单守护开机广播.
      */
-    int onStart(Intent intent, int flags, int startId) {
+    int onStart() {
         //启动前台服务而不显示通知的漏洞已在 API Level 25 修复，大快人心！
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
-            startForeground(sHashCode, new Notification());
+            startForeground(HASH_CODE, new Notification());
             //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
                 startService(new Intent(getApplication(), WorkNotificationService.class));
@@ -42,36 +42,31 @@ public class WorkService extends Service {
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
 
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
-        sSubscription = Observable
-                .interval(3, TimeUnit.SECONDS)
-                .subscribe(count -> {
-                    System.out.println("每 3 秒采集一次数据... count = " + count);
-                    if (count > 0 && count % 18 == 0)
-                        System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
-                });
+        sSubscription = Observable.interval(3, TimeUnit.SECONDS).subscribe(count -> {
+            System.out.println("每 3 秒采集一次数据... count = " + count);
+            if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
+        });
 
         //----------业务逻辑----------
 
-        getPackageManager().setComponentEnabledSetting(
-                new ComponentName(getPackageName(), WatchDogService.class.getName()),
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
+        getPackageManager().setComponentEnabledSetting(new ComponentName(getPackageName(), WatchDogService.class.getName()),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 
         return START_STICKY;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return onStart(intent, flags, startId);
+        return onStart();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        onStart(intent, 0, 0);
+        onStart();
         return null;
     }
 
-    void onEnd(Intent rootIntent) {
+    void onEnd() {
         System.out.println("保存数据到磁盘。");
         startService(new Intent(getApplication(), WorkService.class));
         startService(new Intent(getApplication(), WatchDogService.class));
@@ -82,7 +77,7 @@ public class WorkService extends Service {
      */
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        onEnd(rootIntent);
+        onEnd();
     }
 
     /**
@@ -90,7 +85,7 @@ public class WorkService extends Service {
      */
     @Override
     public void onDestroy() {
-        onEnd(null);
+        onEnd();
     }
 
     public static class WorkNotificationService extends Service {
@@ -100,7 +95,7 @@ public class WorkService extends Service {
          */
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
-            startForeground(WorkService.sHashCode, new Notification());
+            startForeground(WorkService.HASH_CODE, new Notification());
             stopSelf();
             return START_STICKY;
         }

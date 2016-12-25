@@ -15,20 +15,18 @@ import static com.xdandroid.hellodaemon.MainActivity.sApp;
 
 public class WatchDogService extends Service {
 
-    static final int sHashCode = 2;
+    static final int HASH_CODE = 2;
     static final int INTERVAL_WAKE_UP = 6 * 60 * 1000;
 
     static Subscription sSubscription;
     static PendingIntent sPendingIntent;
 
-    public static PowerManager.WakeLock sWakeLock;
-
     /**
      * 守护服务，运行在:watch子进程中
      */
-    int onStart(Intent intent, int flags, int startId) {
+    int onStart() {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-            startForeground(sHashCode, new Notification());
+            startForeground(HASH_CODE, new Notification());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
                 startService(new Intent(getApplication(), WatchDogNotificationService.class));
         }
@@ -38,11 +36,10 @@ public class WatchDogService extends Service {
         //定时检查 WorkService 是否在运行，如果不在运行就把它拉起来
         //Android 5.0+ 使用 JobScheduler，效果比 AlarmManager 好
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            JobInfo.Builder builder = new JobInfo.Builder(sHashCode, new ComponentName(getApplication(), JobSchedulerService.class));
+            JobInfo.Builder builder = new JobInfo.Builder(HASH_CODE, new ComponentName(getApplication(), JobSchedulerService.class));
             builder.setPeriodic(INTERVAL_WAKE_UP);
             //Android 7.0+ 增加了一项针对 JobScheduler 的新限制，最小间隔只能是下面设定的数字
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                builder.setPeriodic(JobInfo.getMinPeriodMillis(), JobInfo.getMinFlexMillis());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) builder.setPeriodic(JobInfo.getMinPeriodMillis(), JobInfo.getMinFlexMillis());
             builder.setPersisted(true);
             JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
             scheduler.schedule(builder.build());
@@ -50,48 +47,33 @@ public class WatchDogService extends Service {
             //Android 4.4- 使用 AlarmManager
             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent i = new Intent(getApplication(), WorkService.class);
-            sPendingIntent = PendingIntent.getService(getApplication(), sHashCode, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            sPendingIntent = PendingIntent.getService(getApplication(), HASH_CODE, i, PendingIntent.FLAG_UPDATE_CURRENT);
             am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + INTERVAL_WAKE_UP, INTERVAL_WAKE_UP, sPendingIntent);
         }
 
         //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
-        sSubscription = Observable
-                .interval(INTERVAL_WAKE_UP, TimeUnit.MILLISECONDS)
+        sSubscription = Observable.interval(INTERVAL_WAKE_UP, TimeUnit.MILLISECONDS)
                 .subscribe(aLong -> startService(new Intent(getApplication(), WorkService.class)), Throwable::printStackTrace);
 
-        //若需要防止 CPU 休眠，这里给出了 WakeLock 的参考实现
-        /*PowerManager pom = (PowerManager) getSystemService(POWER_SERVICE);
-        sWakeLock = pom.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WatchDogService.class.getSimpleName());
-        sWakeLock.setReferenceCounted(false);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        intentFilter.addAction(Intent.ACTION_SCREEN_ON);
-        intentFilter.addAction(Intent.ACTION_USER_PRESENT);
-        try {
-            getApplication().registerReceiver(WakeLockReceiver.getInstance(), intentFilter);
-        } catch (Exception ignored) {}*/
-
         //简单守护开机广播
-        getPackageManager().setComponentEnabledSetting(
-                new ComponentName(getPackageName(), WorkService.class.getName()),
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP);
+        getPackageManager().setComponentEnabledSetting(new ComponentName(getPackageName(), WorkService.class.getName()),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 
         return START_STICKY;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return onStart(intent, flags, startId);
+        return onStart();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        onStart(intent, 0, 0);
+        onStart();
         return null;
     }
 
-    void onEnd(Intent rootIntent) {
+    void onEnd() {
         startService(new Intent(getApplication(), WorkService.class));
         startService(new Intent(getApplication(), WatchDogService.class));
     }
@@ -101,7 +83,7 @@ public class WatchDogService extends Service {
      */
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        onEnd(rootIntent);
+        onEnd();
     }
 
     /**
@@ -109,16 +91,19 @@ public class WatchDogService extends Service {
      */
     @Override
     public void onDestroy() {
-        onEnd(null);
+        onEnd();
     }
 
     /**
-     * 用于在不需要的时候取消 Job / Alarm / Subscription.
+     * 用于在不需要服务运行的时候取消 Job / Alarm / Subscription.
+     *
+     * 因 WatchDogService 运行在 :watch 子进程, 请勿在主进程中直接调用此方法.
+     * 而是向 WakeUpReceiver 发送一个 Action 为 WakeUpReceiver.ACTION_CANCEL_JOB_ALARM_SUB 的广播.
      */
     public static void cancelJobAlarmSub() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             JobScheduler scheduler = (JobScheduler) sApp.getSystemService(JOB_SCHEDULER_SERVICE);
-            scheduler.cancel(sHashCode);
+            scheduler.cancel(HASH_CODE);
         } else {
             AlarmManager am = (AlarmManager) sApp.getSystemService(ALARM_SERVICE);
             if (sPendingIntent != null) am.cancel(sPendingIntent);
@@ -134,7 +119,7 @@ public class WatchDogService extends Service {
          */
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
-            startForeground(WatchDogService.sHashCode, new Notification());
+            startForeground(WatchDogService.HASH_CODE, new Notification());
             stopSelf();
             return START_STICKY;
         }

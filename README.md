@@ -59,7 +59,7 @@ Android 4.4 及以下版本使用 AlarmManager.
 
 #### \+ 使用定时 Observable : 避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
 
-#### \+ 增加在不需要时取消 Job / Alarm / Subscription 的快捷方法.
+#### \+ 增加在不需要服务运行时取消 Job / Alarm / Subscription 的快捷方法 (广播 Action).
 
 #### \+ 增强对国产机型的适配 : 防止华为机型按返回键回到桌面再锁屏后几秒钟进程被杀
 
@@ -125,7 +125,5 @@ Android 4.4 及以下版本使用 AlarmManager.
 #### \+ 在子线程中运行定时任务，处理了运行前检查和销毁时保存的问题
 
 开始任务前，先检查磁盘中是否有上次销毁时保存的数据；定期将数据保存到磁盘。
-
-#### \+ 若需要防止 CPU 休眠，这里给出了 WakeLock 的参考实现
 
 详见代码及注释。

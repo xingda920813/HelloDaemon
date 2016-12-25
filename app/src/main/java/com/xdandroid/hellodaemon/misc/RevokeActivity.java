@@ -43,9 +43,7 @@ public class RevokeActivity extends Activity {
                     int uid = pi.applicationInfo.uid;
                     for (String reqPermission : pi.requestedPermissions) {
                         PermissionInfo permissionInfo = null;
-                        try {
-                            permissionInfo = pm.getPermissionInfo(reqPermission, 0);
-                        } catch (Exception ignored) {}
+                        try {permissionInfo = pm.getPermissionInfo(reqPermission, 0);} catch (Exception ignored) {}
                         if (permissionInfo == null || permissionInfo.protectionLevel != PermissionInfo.PROTECTION_DANGEROUS) continue;
                         if (!permissionInfo.name.startsWith("android")) continue;
                         if (nougat) {
@@ -55,17 +53,13 @@ public class RevokeActivity extends Activity {
                             try {
                                 int code = (int) permissionToOpCodeMethod.invoke(aom, permissionInfo.name);
                                 setUidModeMethod.invoke(aom, code, uid, AppOpsManager.MODE_IGNORED);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            } catch (Exception e) {e.printStackTrace();}
                         }
                     }
                     setModeMethod.invoke(aom, 24, uid, pi.applicationInfo.packageName, AppOpsManager.MODE_IGNORED);
                     setModeMethod.invoke(aom, 23, uid, pi.applicationInfo.packageName, AppOpsManager.MODE_IGNORED);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) {e.printStackTrace();}
         }).start();
         finish();
     }

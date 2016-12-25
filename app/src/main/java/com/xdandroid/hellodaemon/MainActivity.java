@@ -11,7 +11,7 @@ import com.xdandroid.hellodaemon.util.*;
 
 import static com.xdandroid.hellodaemon.util.IntentWrapper.*;
 import static com.xdandroid.hellodaemon.util.IntentWrapper.getApplicationName;
-import static com.xdandroid.hellodaemon.util.IntentWrapper.sIntentWrapperList;
+import static com.xdandroid.hellodaemon.util.IntentWrapper.INTENT_WRAPPER_LIST;
 
 public class MainActivity extends Activity {
 
@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
      */
     void whiteListMatters(View v) {
         boolean nothingMatches = true;
-        for (IntentWrapper intentWrapper : sIntentWrapperList) {
+        for (IntentWrapper intentWrapper : INTENT_WRAPPER_LIST) {
             //如果本机上没有能处理这个Intent的Activity，说明不是对应的机型，直接忽略进入下一次循环。
             if (!intentWrapper.doesActivityExists()) continue;
             switch (intentWrapper.mType) {
