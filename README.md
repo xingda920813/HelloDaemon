@@ -39,9 +39,9 @@ onDestroy 方法只在 设置 -> 开发者选项 -> 正在运行的服务 里停
 
 #### 4.监听 8 种系统广播 :
 
-CONNECTIVITY\_CHANGE, USER\_PRESENT, ACTION\_POWER\_CONNECTED, ACTION\_POWER\_DISCONNECTED, BOOT\_COMPLETED, MEDIA\_MOUNTED, PACKAGE\_ADDED, PACKAGE\_REMOVED.
+CONNECTIVITY\_CHANGE, USER\_PRESENT, ACTION\_POWER\_CONNECTED, ACTION\_POWER\_DISCONNECTED, BOOT\_COMPLETED, PACKAGE\_ADDED, PACKAGE\_REMOVED.
 
-在网络连接改变, 用户屏幕解锁, 电源连接 / 断开, 系统启动完成, 挂载 SD 卡, 安装 / 卸载软件包时拉起 Service.
+在网络连接改变, 用户屏幕解锁, 电源连接 / 断开, 系统启动完成, 安装 / 卸载软件包时拉起 Service.
 
 Service 内部做了判断，若 Service 已在运行，不会重复启动.
 
@@ -65,7 +65,7 @@ Android 4.4 及以下版本使用 AlarmManager.
 
 #### \+ 增强对国产机型的适配 : 防止华为机型按返回键回到桌面再锁屏后几秒钟进程被杀
 
-测试机型 : 华为 荣耀6 Plus (EMUI 3.0 Android 4.4.2), 应用未加入白名单.
+测试机型 : 华为 荣耀6 Plus (EMUI 4.0 Android 6.0), 应用未加入白名单.
 
 >  
 观察到 :
@@ -78,7 +78,7 @@ Android 4.4 及以下版本使用 AlarmManager.
 
 因此，重写了onBackPressed方法，使其只是返回到桌面，而不是将当前Activity finish/destroy掉。
 
-测试机型 : 红米1S 4G (MIUI8 稳定版 Android 4.4.2), 应用未加入白名单.
+测试机型 : 红米1S 4G (MIUI 8 Android 4.4.2), 应用未加入白名单.
 
 >  
 观察到 :
