@@ -55,7 +55,7 @@ public class WatchDogService extends Service {
         sSubscription = Observable.interval(INTERVAL_WAKE_UP, TimeUnit.MILLISECONDS)
                 .subscribe(aLong -> startService(new Intent(getApplication(), WorkService.class)), Throwable::printStackTrace);
 
-        //简单守护开机广播
+        //守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用
         getPackageManager().setComponentEnabledSetting(new ComponentName(getPackageName(), WorkService.class.getName()),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 

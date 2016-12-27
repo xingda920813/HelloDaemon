@@ -20,8 +20,8 @@ public class WorkService extends Service {
      * 1.防止重复启动，可以任意调用startService(Intent i);
      * 2.利用漏洞启动前台服务而不显示通知;
      * 3.在子线程中运行定时任务，处理了运行前检查和销毁时保存的问题;
-     * 4.启动守护服务.
-     * 5.简单守护开机广播.
+     * 4.启动守护服务;
+     * 5.守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用.
      */
     int onStart() {
         //启动前台服务而不显示通知的漏洞已在 API Level 25 修复，大快人心！

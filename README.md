@@ -37,15 +37,17 @@ onDestroy 方法只在 设置 -> 开发者选项 -> 正在运行的服务 里停
 
 #### 3.覆盖 Service 的 onDestroy/onTaskRemoved 方法, 保存数据到磁盘, 然后重新拉起服务
 
-#### 4.监听 3 种系统广播 : BOOT\_COMPLETED, CONNECTIVITY\_CHANGE, USER\_PRESENT
+#### 4.监听 8 种系统广播 :
 
-在系统启动完成、网络连接改变、用户屏幕解锁时拉起 Service。
+CONNECTIVITY\_CHANGE, USER\_PRESENT, ACTION\_POWER\_CONNECTED, ACTION\_POWER\_DISCONNECTED, BOOT\_COMPLETED, MEDIA\_MOUNTED, PACKAGE\_ADDED, PACKAGE\_REMOVED.
 
-Service 内部做了判断，若 Service 已在运行，不会重复启动。
+在网络连接改变, 用户屏幕解锁, 电源连接 / 断开, 系统启动完成, 挂载 SD 卡, 安装 / 卸载软件包时拉起 Service.
+
+Service 内部做了判断，若 Service 已在运行，不会重复启动.
 
 #### 5.开启守护服务 : 定时检查服务是否在运行，如果不在运行就拉起来
 
-#### 6.简单守护开机广播
+#### 6.守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用
 
 详见上面的 2 个链接。
 
