@@ -19,19 +19,8 @@ public class JobSchedulerService extends JobService {
         return false;
     }
 
-    void onEnd() {
-        startService(new Intent(getApplication(), WorkService.class));
-        startService(new Intent(getApplication(), WatchDogService.class));
-    }
-
     @Override
     public boolean onStopJob(JobParameters params) {
-        onEnd();
         return false;
-    }
-
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        onEnd();
     }
 }

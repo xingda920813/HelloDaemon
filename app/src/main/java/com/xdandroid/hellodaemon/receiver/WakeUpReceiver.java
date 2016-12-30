@@ -21,8 +21,11 @@ public class WakeUpReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (intent != null && ACTION_CANCEL_JOB_ALARM_SUB.equals(intent.getAction())) {
+            WatchDogService.cancelJobAlarmSub();
+            return;
+        }
         context.startService(new Intent(context, WorkService.class));
-        if (intent != null && ACTION_CANCEL_JOB_ALARM_SUB.equals(intent.getAction())) WatchDogService.cancelJobAlarmSub();
     }
 
     public static class WakeUpAutoStartReceiver extends BroadcastReceiver {
