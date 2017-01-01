@@ -6,6 +6,9 @@ import android.content.*;
 import android.content.pm.*;
 import android.os.*;
 
+import com.xdandroid.hellodaemon.app.*;
+import com.xdandroid.hellodaemon.receiver.*;
+
 import java.util.concurrent.*;
 
 import rx.*;
@@ -30,22 +33,29 @@ public class WorkService extends Service {
             startForeground(HASH_CODE, new Notification());
             //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                startService(new Intent(getApplication(), WorkNotificationService.class));
+                startService(new Intent(App.sApp, WorkNotificationService.class));
         }
 
         //启动守护服务，运行在:watch子进程中
-        startService(new Intent(getApplication(), WatchDogService.class));
+        startService(new Intent(App.sApp, WatchDogService.class));
 
         //----------业务逻辑----------
 
         //若还没有取消订阅，说明任务仍在运行，为防止重复启动，直接返回START_STICKY
+        //实际使用时，根据需求，将这里更改为自定义的条件，判定服务是否应当启动（任务是否需要运行）
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
 
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
-        sSubscription = Observable.interval(3, TimeUnit.SECONDS).subscribe(count -> {
-            System.out.println("每 3 秒采集一次数据... count = " + count);
-            if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
-        });
+        sSubscription = Observable
+                .interval(3, TimeUnit.SECONDS)
+                //取消任务时取消定时唤醒
+                .doOnUnsubscribe(() -> {
+                    System.out.println("保存数据到磁盘。");
+                    sendBroadcast(new Intent(WakeUpReceiver.ACTION_CANCEL_JOB_ALARM_SUB));
+                }).subscribe(count -> {
+                    System.out.println("每 3 秒采集一次数据... count = " + count);
+                    if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
+                });
 
         //----------业务逻辑----------
 
@@ -68,8 +78,8 @@ public class WorkService extends Service {
 
     void onEnd() {
         System.out.println("保存数据到磁盘。");
-        startService(new Intent(getApplication(), WorkService.class));
-        startService(new Intent(getApplication(), WatchDogService.class));
+        startService(new Intent(App.sApp, WorkService.class));
+        startService(new Intent(App.sApp, WatchDogService.class));
     }
 
     /**

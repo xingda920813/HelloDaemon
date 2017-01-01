@@ -8,9 +8,9 @@ import android.os.*;
 import android.provider.*;
 import android.text.*;
 
-import java.util.*;
+import com.xdandroid.hellodaemon.app.*;
 
-import static com.xdandroid.hellodaemon.MainActivity.sApp;
+import java.util.*;
 
 public class IntentWrapper {
 
@@ -63,11 +63,11 @@ public class IntentWrapper {
 
         //Android 6.0+ Doze 模式
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PowerManager pm = (PowerManager) sApp.getSystemService(Context.POWER_SERVICE);
-            boolean ignoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(sApp.getPackageName());
+            PowerManager pm = (PowerManager) App.sApp.getSystemService(Context.POWER_SERVICE);
+            boolean ignoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(App.sApp.getPackageName());
             if (!ignoringBatteryOptimizations) {
                 Intent dozeIntent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                dozeIntent.setData(Uri.parse("package:" + sApp.getPackageName()));
+                dozeIntent.setData(Uri.parse("package:" + App.sApp.getPackageName()));
                 INTENT_WRAPPER_LIST.add(new IntentWrapper(dozeIntent, DOZE));
             }
         }
@@ -94,13 +94,13 @@ public class IntentWrapper {
         INTENT_WRAPPER_LIST.add(new IntentWrapper(xiaomiGodIntent, XIAOMI_GOD));
 
         //三星 5.0+ 智能管理器
-        Intent samsungIntent = sApp.getPackageManager().getLaunchIntentForPackage("com.samsung.android.sm");
+        Intent samsungIntent = App.sApp.getPackageManager().getLaunchIntentForPackage("com.samsung.android.sm");
         if (samsungIntent != null) INTENT_WRAPPER_LIST.add(new IntentWrapper(samsungIntent, SAMSUNG));
 
         //魅族 自启动管理
         Intent meizuIntent = new Intent("com.meizu.safe.security.SHOW_APPSEC");
         meizuIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        meizuIntent.putExtra("packageName", sApp.getPackageName());
+        meizuIntent.putExtra("packageName", App.sApp.getPackageName());
         INTENT_WRAPPER_LIST.add(new IntentWrapper(meizuIntent, MEIZU));
 
         //魅族 待机耗电管理
@@ -188,7 +188,7 @@ public class IntentWrapper {
      * 判断本机上是否有能处理当前Intent的Activity
      */
     public boolean doesActivityExists() {
-        PackageManager pm = sApp.getPackageManager();
+        PackageManager pm = App.sApp.getPackageManager();
         List<ResolveInfo> list = pm.queryIntentActivities(mIntent, PackageManager.MATCH_DEFAULT_ONLY);
         return list != null && list.size() > 0;
     }
@@ -200,13 +200,13 @@ public class IntentWrapper {
         PackageManager packageManager;
         ApplicationInfo applicationInfo;
         try {
-            packageManager = sApp.getPackageManager();
-            applicationInfo = packageManager.getApplicationInfo(sApp.getPackageName(), 0);
+            packageManager = App.sApp.getPackageManager();
+            applicationInfo = packageManager.getApplicationInfo(App.sApp.getPackageName(), 0);
             sApplicationName = packageManager.getApplicationLabel(applicationInfo).toString();
             return sApplicationName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
-            return sApp.getPackageName();
+            return App.sApp.getPackageName();
         }
     }
 }

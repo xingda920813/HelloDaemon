@@ -7,11 +7,11 @@ import android.content.*;
 import android.content.pm.*;
 import android.os.*;
 
+import com.xdandroid.hellodaemon.app.*;
+
 import java.util.concurrent.*;
 
 import rx.*;
-
-import static com.xdandroid.hellodaemon.MainActivity.sApp;
 
 public class WatchDogService extends Service {
 
@@ -28,7 +28,7 @@ public class WatchDogService extends Service {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             startForeground(HASH_CODE, new Notification());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                startService(new Intent(getApplication(), WatchDogNotificationService.class));
+                startService(new Intent(App.sApp, WatchDogNotificationService.class));
         }
 
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
@@ -36,7 +36,7 @@ public class WatchDogService extends Service {
         //定时检查 WorkService 是否在运行，如果不在运行就把它拉起来
         //Android 5.0+ 使用 JobScheduler，效果比 AlarmManager 好
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            JobInfo.Builder builder = new JobInfo.Builder(HASH_CODE, new ComponentName(getApplication(), JobSchedulerService.class));
+            JobInfo.Builder builder = new JobInfo.Builder(HASH_CODE, new ComponentName(App.sApp, JobSchedulerService.class));
             builder.setPeriodic(INTERVAL_WAKE_UP);
             //Android 7.0+ 增加了一项针对 JobScheduler 的新限制，最小间隔只能是下面设定的数字
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) builder.setPeriodic(JobInfo.getMinPeriodMillis(), JobInfo.getMinFlexMillis());
@@ -46,14 +46,14 @@ public class WatchDogService extends Service {
         } else {
             //Android 4.4- 使用 AlarmManager
             AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-            Intent i = new Intent(getApplication(), WorkService.class);
-            sPendingIntent = PendingIntent.getService(getApplication(), HASH_CODE, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            Intent i = new Intent(App.sApp, WorkService.class);
+            sPendingIntent = PendingIntent.getService(App.sApp, HASH_CODE, i, PendingIntent.FLAG_UPDATE_CURRENT);
             am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + INTERVAL_WAKE_UP, INTERVAL_WAKE_UP, sPendingIntent);
         }
 
         //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
         sSubscription = Observable.interval(INTERVAL_WAKE_UP, TimeUnit.MILLISECONDS)
-                .subscribe(aLong -> startService(new Intent(getApplication(), WorkService.class)), Throwable::printStackTrace);
+                .subscribe(aLong -> startService(new Intent(App.sApp, WorkService.class)), Throwable::printStackTrace);
 
         //守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用
         getPackageManager().setComponentEnabledSetting(new ComponentName(getPackageName(), WorkService.class.getName()),
@@ -74,8 +74,8 @@ public class WatchDogService extends Service {
     }
 
     void onEnd() {
-        startService(new Intent(getApplication(), WorkService.class));
-        startService(new Intent(getApplication(), WatchDogService.class));
+        startService(new Intent(App.sApp, WorkService.class));
+        startService(new Intent(App.sApp, WatchDogService.class));
     }
 
     /**
@@ -102,10 +102,10 @@ public class WatchDogService extends Service {
      */
     public static void cancelJobAlarmSub() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            JobScheduler scheduler = (JobScheduler) sApp.getSystemService(JOB_SCHEDULER_SERVICE);
+            JobScheduler scheduler = (JobScheduler) App.sApp.getSystemService(JOB_SCHEDULER_SERVICE);
             scheduler.cancel(HASH_CODE);
         } else {
-            AlarmManager am = (AlarmManager) sApp.getSystemService(ALARM_SERVICE);
+            AlarmManager am = (AlarmManager) App.sApp.getSystemService(ALARM_SERVICE);
             if (sPendingIntent != null) am.cancel(sPendingIntent);
         }
         if (sSubscription != null) sSubscription.unsubscribe();
