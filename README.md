@@ -61,7 +61,9 @@ Android 4.4 及以下版本使用 AlarmManager.
 
 #### \+ 使用定时 Observable : 避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
 
-#### \+ 增加在不需要服务运行时取消 Job / Alarm / Subscription 的快捷方法 (广播 Action).
+#### \+ 增加停止服务并取消定时唤醒的快捷方法
+
+#### \+ 增加在不需要服务运行时取消 Job / Alarm / Subscription 的快捷方法 (广播 Action)
 
 #### \+ 增强对国产机型的适配 : 防止华为机型按返回键回到桌面再锁屏后几秒钟进程被杀
 
