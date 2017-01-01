@@ -18,17 +18,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.btn_start).setOnClickListener(v -> startService(new Intent(App.sApp, WorkService.class)));
+        findViewById(R.id.btn_start).setOnClickListener(v -> {
+            //我们现在需要服务运行, 将标志位重置为 false
+            WorkService.sShouldStopService = false;
+            startService(new Intent(App.sApp, WorkService.class));
+        });
         findViewById(R.id.btn_white).setOnClickListener(this::whiteListMatters);
-        /*
-         * 停止服务并取消定时唤醒
-         *
-         * 停止服务使用取消订阅的方式实现，而不是调用 stopService。因为：
-         * 1.stopService 会调用 Service.onDestroy()，而 WorkService 做了保活处理，会把 Service 再拉起来；
-         * 2.我们希望 WorkService 起到一个类似于控制台的角色，即 WorkService 始终运行 (无论任务是否需要运行)，
-         * 而是通过 onStart() 里自定义的条件，来决定服务是否应当启动或停止。
-         */
-        findViewById(R.id.btn_stop).setOnClickListener(v -> {if (WorkService.sSubscription != null) WorkService.sSubscription.unsubscribe();});
+        findViewById(R.id.btn_stop).setOnClickListener(v -> WorkService.stopService());
     }
 
     /**
