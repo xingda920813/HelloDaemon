@@ -24,11 +24,10 @@ public class WatchDogService extends Service {
     /**
      * 守护服务，运行在:watch子进程中
      */
-    int onStart() {
+    int onStart(Intent intent, int flags, int startId) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             startForeground(HASH_CODE, new Notification());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                startService(new Intent(App.sApp, WatchDogNotificationService.class));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(App.sApp, WatchDogNotificationService.class));
         }
 
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
@@ -64,16 +63,16 @@ public class WatchDogService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return onStart();
+        return onStart(intent, flags, startId);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        onStart();
+        onStart(intent, 0, 0);
         return null;
     }
 
-    void onEnd() {
+    void onEnd(Intent rootIntent) {
         startService(new Intent(App.sApp, WorkService.class));
         startService(new Intent(App.sApp, WatchDogService.class));
     }
@@ -83,7 +82,7 @@ public class WatchDogService extends Service {
      */
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        onEnd();
+        onEnd(rootIntent);
     }
 
     /**
@@ -91,7 +90,7 @@ public class WatchDogService extends Service {
      */
     @Override
     public void onDestroy() {
-        onEnd();
+        onEnd(null);
     }
 
     /**
