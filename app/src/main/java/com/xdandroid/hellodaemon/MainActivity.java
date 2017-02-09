@@ -55,8 +55,8 @@ public class MainActivity extends Activity {
                     new AlertDialog.Builder(this)
                             .setCancelable(false)
                             .setTitle("需要允许 " + getApplicationName() + " 自动启动")
-                            .setMessage("轨迹跟踪服务的持续运行需要允许 " + getApplicationName() + " 的后台自动启动。\n\n" +
-                                    "请点击『确定』，在弹出的『自动启动管理』中，将 " + getApplicationName() + " 对应的开关打开。")
+                            .setMessage("轨迹跟踪服务的持续运行需要允许 " + getApplicationName() + " 的自动启动。\n\n" +
+                                    "请点击『确定』，在弹出的『自启管理』中，将 " + getApplicationName() + " 对应的开关打开。")
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
                             .show();
                     break;
@@ -65,9 +65,9 @@ public class MainActivity extends Activity {
                     nothingMatches = false;
                     new AlertDialog.Builder(this)
                             .setCancelable(false)
-                            .setTitle("" + getApplicationName() + " 需要加入受保护的应用名单")
-                            .setMessage("轨迹跟踪服务的持续运行需要 " + getApplicationName() + " 加入到受保护的应用名单。\n\n" +
-                                    "请点击『确定』，在弹出的『受保护应用』列表中，将 " + getApplicationName() + " 对应的开关打开。")
+                            .setTitle(getApplicationName() + " 需要加入锁屏清理白名单")
+                            .setMessage("轨迹跟踪服务的持续运行需要 " + getApplicationName() + " 加入到锁屏清理白名单。\n\n" +
+                                    "请点击『确定』，在弹出的『锁屏清理』列表中，将 " + getApplicationName() + " 对应的开关打开。")
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
                             .show();
                     break;
@@ -81,13 +81,23 @@ public class MainActivity extends Activity {
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
                             .show();
                     break;
-                case SAMSUNG:
+                case SAMSUNG_L:
                     nothingMatches = false;
                     new AlertDialog.Builder(this)
                             .setCancelable(false)
                             .setTitle("需要允许 " + getApplicationName() + " 的自启动")
                             .setMessage("轨迹跟踪服务的持续运行需要 " + getApplicationName() + " 在屏幕关闭时继续运行。\n\n" +
                                     "请点击『确定』，在弹出的『智能管理器』中，点击『内存』，选择『自启动应用程序』选项卡，将 " + getApplicationName() + " 对应的开关打开。")
+                            .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
+                            .show();
+                    break;
+                case SAMSUNG_M:
+                    nothingMatches = false;
+                    new AlertDialog.Builder(this)
+                            .setCancelable(false)
+                            .setTitle("需要允许 " + getApplicationName() + " 的自启动")
+                            .setMessage("轨迹跟踪服务的持续运行需要 " + getApplicationName() + " 在屏幕关闭时继续运行。\n\n" +
+                                    "请点击『确定』，在弹出的『电池』页面中，点击『未监视的应用程序』->『添加应用程序』，勾选 " + getApplicationName() + "，然后点击『完成』。")
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
                             .show();
                     break;
@@ -105,7 +115,7 @@ public class MainActivity extends Activity {
                     nothingMatches = false;
                     new AlertDialog.Builder(this)
                             .setCancelable(false)
-                            .setTitle("" + getApplicationName() + " 需要在待机时保持运行")
+                            .setTitle(getApplicationName() + " 需要在待机时保持运行")
                             .setMessage("轨迹跟踪服务的持续运行需要 " + getApplicationName() + " 在待机时保持运行。\n\n" +
                                     "请点击『确定』，在弹出的『待机耗电管理』中，将 " + getApplicationName() + " 对应的开关打开。")
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
@@ -121,26 +131,6 @@ public class MainActivity extends Activity {
                             .setTitle("需要允许 " + getApplicationName() + " 的自启动")
                             .setMessage("轨迹跟踪服务的持续运行需要 " + getApplicationName() + " 加入到自启动白名单。\n\n" +
                                     "请点击『确定』，在弹出的『自启动管理』中，将 " + getApplicationName() + " 对应的开关打开。")
-                            .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
-                            .show();
-                    break;
-                case OPPO_GOD:
-                    nothingMatches = false;
-                    new AlertDialog.Builder(this)
-                            .setCancelable(false)
-                            .setTitle("需要允许 " + getApplicationName() + " 在后台运行")
-                            .setMessage("轨迹跟踪服务的持续运行需要允许 " + getApplicationName() + " 在后台运行。\n\n" +
-                                    "请点击『确定』，在弹出的『纯净后台应用管控』中，将 " + getApplicationName() + " 对应的开关打开。")
-                            .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
-                            .show();
-                    break;
-                case VIVO:
-                    nothingMatches = false;
-                    new AlertDialog.Builder(this)
-                            .setCancelable(false)
-                            .setTitle("需要允许 " + getApplicationName() + " 的自启动")
-                            .setMessage("轨迹跟踪服务的持续运行需要允许 " + getApplicationName() + " 的自启动。\n\n" +
-                                    "请点击『确定』，在弹出的 i管家 中，找到『软件管理』->『自启动管理』，将 " + getApplicationName() + " 对应的开关打开。")
                             .setPositiveButton("确定", (d, w) -> intentWrapper.startActivity(this))
                             .show();
                     break;
