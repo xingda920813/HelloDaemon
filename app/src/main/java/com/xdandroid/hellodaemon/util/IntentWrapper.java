@@ -173,8 +173,8 @@ public class IntentWrapper {
     /**
      * 安全地启动一个Activity
      */
-    public void startActivity(Activity activity) {
-        try {activity.startActivity(mIntent);} catch (Exception e) {e.printStackTrace();}
+    public void startActivity(Activity a) {
+        try {a.startActivity(mIntent);} catch (Exception e) {e.printStackTrace();}
     }
 
     /**
