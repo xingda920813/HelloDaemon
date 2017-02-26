@@ -16,6 +16,9 @@ android {
             minifyEnabled false
         }
     }
+    compileOptions {
+        encoding "UTF-8"
+    }
 }
 
 dependencies {
