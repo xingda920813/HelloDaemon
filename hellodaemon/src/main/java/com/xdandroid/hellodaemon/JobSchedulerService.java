@@ -1,11 +1,9 @@
-package com.xdandroid.hellodaemon.service;
+package com.xdandroid.hellodaemon;
 
 import android.annotation.*;
 import android.app.job.*;
 import android.content.*;
 import android.os.*;
-
-import com.xdandroid.hellodaemon.app.*;
 
 /**
  * Android 5.0+ 使用的 JobScheduler.
@@ -16,7 +14,8 @@ public class JobSchedulerService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        startService(new Intent(App.sApp, WorkService.class));
+        if (!DaemonEnv.sInitialized) return false;
+        startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));
         jobFinished(params, false);
         return false;
     }

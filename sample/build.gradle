@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.xdandroid.hellodaemon"
+        applicationId "com.xdandroid.sample"
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
@@ -16,11 +16,9 @@ android {
             minifyEnabled false
         }
     }
-    compileOptions {
-        encoding "UTF-8"
-    }
 }
 
 dependencies {
     compile 'io.reactivex:rxjava:+'
+    compile project(':hellodaemon')
 }

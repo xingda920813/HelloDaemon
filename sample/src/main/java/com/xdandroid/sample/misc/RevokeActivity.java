@@ -1,4 +1,4 @@
-package com.xdandroid.hellodaemon.misc;
+package com.xdandroid.sample.misc;
 
 import android.app.*;
 import android.content.pm.*;

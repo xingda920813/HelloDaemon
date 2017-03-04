@@ -1,15 +1,13 @@
-package com.xdandroid.hellodaemon.receiver;
+package com.xdandroid.hellodaemon;
 
 import android.content.*;
-
-import com.xdandroid.hellodaemon.service.*;
 
 public class WakeUpReceiver extends BroadcastReceiver {
 
     /**
      * 向 WakeUpReceiver 发送带有此 Action 的广播, 即可在不需要服务运行的时候取消 Job / Alarm / Subscription.
      */
-    public static final String ACTION_CANCEL_JOB_ALARM_SUB = "com.xdandroid.hellodaemon.CANCEL_JOB_ALARM_SUB";
+    protected static final String ACTION_CANCEL_JOB_ALARM_SUB = "com.xdandroid.hellodaemon.CANCEL_JOB_ALARM_SUB";
 
     /**
      * 监听 8 种系统广播 :
@@ -25,14 +23,16 @@ public class WakeUpReceiver extends BroadcastReceiver {
             WatchDogService.cancelJobAlarmSub();
             return;
         }
-        context.startService(new Intent(context, WorkService.class));
+        if (!DaemonEnv.sInitialized) return;
+        context.startService(new Intent(context, DaemonEnv.sServiceClass));
     }
 
     public static class WakeUpAutoStartReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            context.startService(new Intent(context, WorkService.class));
+            if (!DaemonEnv.sInitialized) return;
+            context.startService(new Intent(context, DaemonEnv.sServiceClass));
         }
     }
 }

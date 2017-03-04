@@ -1,0 +1,65 @@
+apply plugin: 'com.android.library'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'hellodaemon'
+
+    publishedGroupId = 'com.xdandroid'
+    libraryName = 'HelloDaemon'
+    artifact = 'hellodaemon'
+
+    libraryDescription = 'Android service daemon using JobScheduler.'
+
+    siteUrl = 'https://github.com/xingda920813/HelloDaemon'
+    gitUrl = 'https://github.com/xingda920813/HelloDaemon.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'xingda920813'
+    developerName = 'Da Xing'
+    developerEmail = '570396198@qq.com'
+
+    licenseName = 'The MIT License (MIT)'
+    licenseUrl = 'https://opensource.org/licenses/MIT'
+    allLicenses = ["MIT"]
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile 'io.reactivex:rxjava:+'
+    compile 'com.android.support:support-annotations:+'
+}
+
+task makeJar(type: Copy) {
+    delete 'build/libs/HelloDaemon-1.0.0.jar'
+    from('build/intermediates/bundles/default/')
+    into('build/libs/')
+    include('classes.jar')
+    rename ('classes.jar', 'HelloDaemon-1.0.0.jar')
+}
+
+makeJar.dependsOn(build)
+
+// Place it at the end of the file
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'bintrayv1.gradle'
