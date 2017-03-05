@@ -140,7 +140,7 @@ build.gradle 中添加
 compile 'com.xdandroid:hellodaemon:+'
 ```
 
-### 2.继承 AbsWorkService, 重写 6 个抽象方法
+### 2.继承 AbsWorkService, 实现 6 个抽象方法
 
 ```
 /**
@@ -159,8 +159,8 @@ void startWork();
 
 void stopWork();
 
-//Service.onBind()
-@Nullable IBinder onBind();
+//Service.onBind(Intent intent)
+@Nullable IBinder onBind(Intent intent, Void unused);
 
 //服务被杀时调用, 可以在这里面保存数据.
 void onServiceKilled();
@@ -170,13 +170,13 @@ void onServiceKilled();
 
 ### 3.自定义 Application
 
-在 Application 的 onCreate 中, 调用
+在 Application 的 onCreate() 中, 调用
 
 ```
 DaemonEnv.initialize(
   Context app,  //Application Context.
   Class<? extends AbsWorkService> serviceClass, //刚才创建的 Service 对应的 Class 对象.
-  @Nullable Integer wakeUpInterval);  //定时唤醒的时间间隔(ms).
+  @Nullable Integer wakeUpInterval);  //定时唤醒的时间间隔(ms), 默认 6 分钟.
 
 Context.startService(new Intent(Context app, Class<? extends AbsWorkService> serviceClass));
 ```
