@@ -20,10 +20,10 @@ public class RevokeActivity extends Activity {
         new Thread(new Runnable() {
             public void run() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
-                PackageManager pm = RevokeActivity.this.getPackageManager();
+                PackageManager pm = getPackageManager();
                 List<PackageInfo> installedPackages = pm.getInstalledPackages(PackageManager.GET_PERMISSIONS);
                 Class<AppOpsManager> aomClazz = AppOpsManager.class;
-                AppOpsManager aom = RevokeActivity.this.getSystemService(aomClazz);
+                AppOpsManager aom = getSystemService(aomClazz);
                 boolean nougat = true;
                 try {
                     Method setUidModeMethod;

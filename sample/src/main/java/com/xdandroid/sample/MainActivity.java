@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViewById(R.id.btn_start).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {MainActivity.this.startService(new Intent(MainActivity.this, TraceServiceImpl.class));}
+            public void onClick(View v) {startService(new Intent(MainActivity.this, TraceServiceImpl.class));}
         });
         //处理白名单
         findViewById(R.id.btn_white).setOnClickListener(new View.OnClickListener() {
