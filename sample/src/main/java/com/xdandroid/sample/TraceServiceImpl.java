@@ -8,6 +8,7 @@ import com.xdandroid.hellodaemon.*;
 import java.util.concurrent.*;
 
 import rx.*;
+import rx.functions.*;
 
 public class TraceServiceImpl extends AbsWorkService {
 
@@ -39,12 +40,16 @@ public class TraceServiceImpl extends AbsWorkService {
         sSubscription = Observable
                 .interval(3, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
-                .doOnUnsubscribe(() -> {
-                    System.out.println("保存数据到磁盘。");
-                    cancelJobAlarmSub();
-                }).subscribe(count -> {
-                    System.out.println("每 3 秒采集一次数据... count = " + count);
-                    if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
+                .doOnUnsubscribe(new Action0() {
+                    public void call() {
+                        System.out.println("保存数据到磁盘。");
+                        cancelJobAlarmSub();
+                    }
+                }).subscribe(new Action1<Long>() {
+                    public void call(Long count) {
+                        System.out.println("每 3 秒采集一次数据... count = " + count);
+                        if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
+                    }
                 });
     }
 
