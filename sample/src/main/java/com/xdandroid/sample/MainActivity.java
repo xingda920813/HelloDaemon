@@ -4,10 +4,12 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.view.*;
+import android.widget.TextView;
 
 import com.xdandroid.hellodaemon.*;
 
 public class MainActivity extends Activity {
+    private TextView txtSocket,txtSocketStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +25,31 @@ public class MainActivity extends Activity {
         findViewById(R.id.btn_stop).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {TraceServiceImpl.stopService();}
         });
+        findViewById(R.id.btn_update).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                getUrl();
+            }
+        });
+        txtSocket = (TextView) findViewById(R.id.txtSocket);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        txtSocket.setText(App.URL_SOCKET);
     }
 
     //防止华为机型未加入白名单时按返回键回到桌面再锁屏后几秒钟进程被杀
     @Override public void onBackPressed() { IntentWrapper.onBackPressed(this); }
+
+    public void getUrl(){
+        AsyncTextViewLoader textViewLoader = new AsyncTextViewLoader(MainActivity.this, new Callback(){
+
+            @Override
+            public void execute() {
+                txtSocket.setText(App.URL_SOCKET);
+            }
+        });
+        textViewLoader.execute();
+    }
 }

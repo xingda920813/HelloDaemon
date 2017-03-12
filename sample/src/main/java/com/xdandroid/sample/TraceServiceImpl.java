@@ -1,20 +1,31 @@
 package com.xdandroid.sample;
 
+import android.app.*;
+import android.app.Notification;
 import android.content.*;
 import android.os.*;
+import android.support.v7.app.NotificationCompat;
 
 import com.xdandroid.hellodaemon.*;
 
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.*;
 
 import rx.*;
 import rx.functions.*;
 
 public class TraceServiceImpl extends AbsWorkService {
-
+    private WebSocketClient cc;
     //是否 任务完成, 不再需要服务运行?
     public static boolean sShouldStopService;
     public static Subscription sSubscription;
+    private int FOREGROUND_ID = 8000;
+    private boolean isQuery = false;
 
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
@@ -49,6 +60,73 @@ public class TraceServiceImpl extends AbsWorkService {
                     public void call(Long count) {
                         System.out.println("每 3 秒采集一次数据... count = " + count);
                         if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
+
+                        if(App.URL_SOCKET.isEmpty() && isQuery == false){
+                            isQuery = true;
+                            getUrl();
+                        }
+
+                        if((cc==null || cc.getConnection()==null || !cc.getConnection().isOpen()) && !App.URL_SOCKET.isEmpty()) {
+                            try {
+                                cc = new WebSocketClient(new URI(App.URL_SOCKET)) {
+                                    @Override
+                                    public void onMessage(String message) {
+                                        System.out.println(message);
+
+                                        String title="title";
+                                        String content = message;
+                                        try{
+                                            JSONObject json = new JSONObject(message);
+                                            title = json.getString("title");
+                                            content = json.getString("message");
+                                        }catch (Exception exp){
+                                            System.out.println(exp.toString());
+                                        }
+
+                                        NotificationCompat.Builder builder = new NotificationCompat.Builder(TraceServiceImpl.this);
+                                        builder.setSmallIcon(R.mipmap.ic_launcher);
+                                        builder.setContentTitle(title);
+                                        builder.setContentText(content);
+                                        builder.setContentInfo("message");
+                                        builder.setWhen(System.currentTimeMillis());
+
+                                        builder.setPriority(NotificationCompat.PRIORITY_MAX);
+                                        builder.setAutoCancel(true);
+
+                                        builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+
+                                        Intent activityIntent = new Intent(TraceServiceImpl.this, MainActivity.class);
+                                        PendingIntent pendingIntent = PendingIntent.getActivity(TraceServiceImpl.this, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                        builder.setContentIntent(pendingIntent);
+                                        android.app.Notification notification = builder.build();
+
+                                        NotificationManager mNotificationManager = (NotificationManager) TraceServiceImpl.this.getSystemService(Context.NOTIFICATION_SERVICE);
+                                        mNotificationManager.notify(++FOREGROUND_ID, notification);
+                                    }
+
+                                    @Override
+                                    public void onOpen(ServerHandshake handshake) {
+                                        System.out.println("onOpen");
+                                    }
+
+                                    @Override
+                                    public void onClose(int code, String reason, boolean remote) {
+                                        System.out.println("onClose");
+                                    }
+
+                                    @Override
+                                    public void onError(Exception ex) {
+                                        System.out.println("onError");
+                                    }
+                                };
+
+                                cc.connect();
+                            } catch (URISyntaxException ex) {
+                                App.URL_SOCKET = "";
+                                isQuery = false;
+                                System.out.println(" is not a valid WebSocket URI\n");
+                            }
+                        }
                     }
                 });
     }
@@ -76,5 +154,10 @@ public class TraceServiceImpl extends AbsWorkService {
     @Override
     public void onServiceKilled(Intent rootIntent) {
         System.out.println("保存数据到磁盘。");
+    }
+
+    public void getUrl(){
+        AsyncTextViewLoader textViewLoader = new AsyncTextViewLoader(TraceServiceImpl.this,null);
+        textViewLoader.execute();
     }
 }

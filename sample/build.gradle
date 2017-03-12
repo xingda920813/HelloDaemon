@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "com.xdandroid.sample"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -15,9 +15,20 @@ android {
             minifyEnabled false
         }
     }
+    dexOptions {
+        incremental false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile 'io.reactivex:rxjava:+'
     compile project(':hellodaemon')
+    compile 'org.java-websocket:Java-WebSocket:1.3.0'
+    compile 'com.android.support:appcompat-v7:25.2.0'
 }
