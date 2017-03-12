@@ -30,7 +30,13 @@ public class MainActivity extends Activity {
                 getUrl();
             }
         });
-        txtSocket = (TextView) findViewById(R.id.txtSocket);
+        txtSocket = (TextView) findViewById(R.id.txt_socket);
+
+        findViewById(R.id.btn_view).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ((TextView) findViewById(R.id.txt_view)).setText(App.STATUS);
+            }
+        });
     }
 
     @Override

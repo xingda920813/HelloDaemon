@@ -8,6 +8,7 @@ import com.xdandroid.hellodaemon.*;
 public class App extends Application {
 
     public static String URL_SOCKET = "";
+    public static String STATUS="";
 
     @Override
     public void onCreate() {

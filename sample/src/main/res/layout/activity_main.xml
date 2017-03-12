@@ -7,7 +7,7 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/txtSocket"
+        android:id="@+id/txt_socket"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView" />
@@ -35,4 +35,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="更新地址"/>
+
+    <Button
+        android:id="@+id/btn_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查看状态"/>
+
+    <TextView
+        android:id="@+id/txt_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="状态" />
 </LinearLayout>

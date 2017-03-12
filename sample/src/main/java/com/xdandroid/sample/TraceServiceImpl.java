@@ -26,6 +26,7 @@ public class TraceServiceImpl extends AbsWorkService {
     public static Subscription sSubscription;
     private int FOREGROUND_ID = 8000;
     private boolean isQuery = false;
+    private boolean isOpen = false;
 
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
@@ -34,6 +35,8 @@ public class TraceServiceImpl extends AbsWorkService {
         if (sSubscription != null) sSubscription.unsubscribe();
         //取消 Job / Alarm / Subscription
         cancelJobAlarmSub();
+
+        App.STATUS = "stopService";
     }
 
     /**
@@ -49,7 +52,7 @@ public class TraceServiceImpl extends AbsWorkService {
     public void startWork(Intent intent, int flags, int startId) {
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
         sSubscription = Observable
-                .interval(3, TimeUnit.SECONDS)
+                .interval(10, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
                 .doOnUnsubscribe(new Action0() {
                     public void call() {
@@ -66,13 +69,14 @@ public class TraceServiceImpl extends AbsWorkService {
                             getUrl();
                         }
 
-                        if((cc==null || cc.getConnection()==null || !cc.getConnection().isOpen()) && !App.URL_SOCKET.isEmpty()) {
+                        if(!isOpen && !App.URL_SOCKET.isEmpty()) {
                             try {
                                 cc = new WebSocketClient(new URI(App.URL_SOCKET)) {
                                     @Override
                                     public void onMessage(String message) {
                                         System.out.println(message);
-
+                                        isOpen = true;
+                                        App.STATUS = "Socket onMessage";
                                         String title="title";
                                         String content = message;
                                         try{
@@ -106,25 +110,37 @@ public class TraceServiceImpl extends AbsWorkService {
 
                                     @Override
                                     public void onOpen(ServerHandshake handshake) {
+                                        isOpen = true;
+                                        App.STATUS = "Socket onOpen";
                                         System.out.println("onOpen");
                                     }
 
                                     @Override
                                     public void onClose(int code, String reason, boolean remote) {
+                                        isOpen = false;
+                                        App.STATUS = "Socket onClose";
                                         System.out.println("onClose");
                                     }
 
                                     @Override
                                     public void onError(Exception ex) {
+                                        isOpen = false;
+                                        App.STATUS = "Socket onError";
                                         System.out.println("onError");
                                     }
                                 };
-
                                 cc.connect();
                             } catch (URISyntaxException ex) {
                                 App.URL_SOCKET = "";
                                 isQuery = false;
+                                App.STATUS = "Socket exception";
                                 System.out.println(" is not a valid WebSocket URI\n");
+                            }
+                        }else{
+                            if(cc!=null && count%6==0){
+                                System.out.println("tick on");
+                                App.STATUS = "tick on";
+                                cc.send("tick on");
                             }
                         }
                     }
@@ -133,6 +149,7 @@ public class TraceServiceImpl extends AbsWorkService {
 
     @Override
     public void stopWork(Intent intent, int flags, int startId) {
+        App.STATUS = "stopWork";
         stopService();
     }
 
