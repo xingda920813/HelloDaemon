@@ -64,7 +64,7 @@ public class TraceServiceImpl extends AbsWorkService {
                         System.out.println("每 3 秒采集一次数据... count = " + count);
                         if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
 
-                        if(App.URL_SOCKET.isEmpty() && isQuery == false){
+                        if(App.URL_SOCKET.isEmpty() && isQuery == false ){
                             isQuery = true;
                             getUrl();
                         }
@@ -119,6 +119,8 @@ public class TraceServiceImpl extends AbsWorkService {
                                     public void onClose(int code, String reason, boolean remote) {
                                         isOpen = false;
                                         App.STATUS = "Socket onClose";
+                                        App.URL_SOCKET = "";
+                                        isQuery = false;
                                         System.out.println("onClose");
                                     }
 
@@ -126,6 +128,8 @@ public class TraceServiceImpl extends AbsWorkService {
                                     public void onError(Exception ex) {
                                         isOpen = false;
                                         App.STATUS = "Socket onError";
+                                        App.URL_SOCKET = "";
+                                        isQuery = false;
                                         System.out.println("onError");
                                     }
                                 };
