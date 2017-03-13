@@ -31,6 +31,8 @@ public class IntentWrapper {
     protected static final int OPPO = 106;
     //三星 6.0+ 未监视的应用程序管理
     protected static final int SAMSUNG_M = 107;
+    //Oppo 自启动管理(旧版本系统)
+    protected static final int OPPO_OLD = 108;
     //Vivo 后台高耗电
     protected static final int VIVO_GOD = 109;
     //金立 应用自启
@@ -115,6 +117,11 @@ public class IntentWrapper {
             Intent oppoIntent = new Intent();
             oppoIntent.setComponent(new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.permission.startup.StartupAppListActivity"));
             sIntentWrapperList.add(new IntentWrapper(oppoIntent, OPPO));
+
+            //Oppo 自启动管理(旧版本系统)
+            Intent oppoOldIntent = new Intent();
+            oppoOldIntent.setComponent(new ComponentName("com.color.safecenter", "com.color.safecenter.permission.startup.StartupAppListActivity"));
+            sIntentWrapperList.add(new IntentWrapper(oppoOldIntent, OPPO_OLD));
 
             //Vivo 后台高耗电
             Intent vivoGodIntent = new Intent();
@@ -290,6 +297,7 @@ public class IntentWrapper {
                 case LETV:
                 case XIAOMI:
                 case OPPO:
+                case OPPO_OLD:
                     new AlertDialog.Builder(a)
                             .setCancelable(false)
                             .setTitle("需要允许 " + getApplicationName() + " 的自启动")
