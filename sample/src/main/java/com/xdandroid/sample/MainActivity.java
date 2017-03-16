@@ -16,18 +16,23 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViewById(R.id.btn_start).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {startService(new Intent(MainActivity.this, TraceServiceImpl.class));}
+            public void onClick(View v) {
+                startService(new Intent(MainActivity.this, TraceServiceImpl.class));
+            }
         });
         //处理白名单
         findViewById(R.id.btn_white).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {IntentWrapper.whiteListMatters(MainActivity.this, "轨迹跟踪服务的持续运行");}
         });
         findViewById(R.id.btn_stop).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {TraceServiceImpl.stopService();}
-        });
+            public void onClick(View v) {
+                TraceServiceImpl.stopService();
+            }
+        }
+        );
         findViewById(R.id.btn_address).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                txtSocket.setText(App.URL_SOCKET);
+                //txtSocket.setText(App.URL_SOCKET);
             }
         });
         txtSocket = (TextView) findViewById(R.id.txt_socket);
@@ -42,7 +47,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        txtSocket.setText(App.URL_SOCKET);
+        //txtSocket.setText(App.URL_SOCKET);
     }
 
     //防止华为机型未加入白名单时按返回键回到桌面再锁屏后几秒钟进程被杀

@@ -21,13 +21,12 @@ import rx.*;
 import rx.functions.*;
 
 public class TraceServiceImpl extends AbsWorkService {
-    private WebSocketClient cc;
+    private WebSocketClient cc = null;
+    private String URL_SOCKET = "";
     //是否 任务完成, 不再需要服务运行?
     public static boolean sShouldStopService;
     public static Subscription sSubscription;
     private int FOREGROUND_ID = 8000;
-    //private boolean isQuery = false;
-    //private boolean isOpen = false;
 
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
@@ -67,10 +66,10 @@ public class TraceServiceImpl extends AbsWorkService {
 
                         if(App.isNetworkAvailable(TraceServiceImpl.this)){
                             if(cc==null){
-                                if(App.URL_SOCKET.isEmpty())
+                                if(URL_SOCKET.isEmpty())
                                     getUrl();
                                 else
-                                    cc = createSocket(App.URL_SOCKET);
+                                    cc = createSocket(URL_SOCKET);
                             }else{
                                 try {
                                     if(cc.getReadyState() == WebSocket.READYSTATE.OPEN) {
@@ -80,13 +79,10 @@ public class TraceServiceImpl extends AbsWorkService {
                                             App.STATUS = "tick on";
                                         }
                                     }else{
-                                        System.out.println("create socket again");
-                                        App.URL_SOCKET = "";
-                                        cc = null;
-                                        App.STATUS = "create socket again";
+                                        cc.connect();
                                     }
                                 } catch (Exception exp) {
-                                    App.URL_SOCKET = "";
+                                    URL_SOCKET = "";
                                     cc = null;
                                     exp.printStackTrace();
                                 }
@@ -94,7 +90,7 @@ public class TraceServiceImpl extends AbsWorkService {
                         }else{
                             App.STATUS = "network is error";
                             System.out.println("network is error");
-                            App.URL_SOCKET = "";
+                            URL_SOCKET = "";
                             cc = null;
                         }
 
@@ -104,6 +100,7 @@ public class TraceServiceImpl extends AbsWorkService {
 
     @Override
     public void stopWork(Intent intent, int flags, int startId) {
+
         stopService();
     }
 
@@ -128,7 +125,13 @@ public class TraceServiceImpl extends AbsWorkService {
     }
 
     public void getUrl(){
-        AsyncTextViewLoader textViewLoader = new AsyncTextViewLoader(TraceServiceImpl.this,null);
+        AsyncTextViewLoader textViewLoader = new AsyncTextViewLoader(TraceServiceImpl.this,new Callback(){
+
+            @Override
+            public void execute(String result) {
+                URL_SOCKET = result;
+            }
+        });
         textViewLoader.execute();
     }
 

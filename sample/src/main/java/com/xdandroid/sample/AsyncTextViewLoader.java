@@ -11,10 +11,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.xdandroid.sample.App.URL_SOCKET;
+public class AsyncTextViewLoader extends AsyncTask<String, Integer, String> {
 
-public class AsyncTextViewLoader extends AsyncTask<String, Integer, Boolean> {
-    private String txtResult;
     private Context context;
     private Callback callback;
 
@@ -24,9 +22,9 @@ public class AsyncTextViewLoader extends AsyncTask<String, Integer, Boolean> {
     }
 
     @Override
-    protected Boolean doInBackground(String... params) {
+    protected String doInBackground(String... params) {
         String strUrl = "http://ichess.sinaapp.com/ext/channel.php";
-
+        String txtResult = "";
         try {
             //创建URL对象
             URL url = new URL(strUrl);//Get请求可以在Url中带参数： ①url + "?bookname=" + name;②url="http://www.baidu.com?name=zhang&pwd=123";
@@ -48,7 +46,7 @@ public class AsyncTextViewLoader extends AsyncTask<String, Integer, Boolean> {
                 line = new String(line.getBytes("UTF-8"));
                 stringBuffer.append(line);
             }
-            URL_SOCKET = txtResult = stringBuffer.toString();
+            txtResult = stringBuffer.toString();
             bufferedReader.close();
             httpURLConnection.disconnect();
         } catch (MalformedURLException e) {
@@ -59,7 +57,7 @@ public class AsyncTextViewLoader extends AsyncTask<String, Integer, Boolean> {
             e.printStackTrace();
         }
 
-        return true;
+        return txtResult;
     }
 
     @Override
@@ -68,9 +66,9 @@ public class AsyncTextViewLoader extends AsyncTask<String, Integer, Boolean> {
     }
 
     @Override
-    protected void onPostExecute(Boolean result) {
+    protected void onPostExecute(String result) {
         if(callback!=null){
-            callback.execute();
+            callback.execute(result);
         }
     }
 

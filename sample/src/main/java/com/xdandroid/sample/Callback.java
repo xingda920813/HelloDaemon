@@ -5,5 +5,5 @@ package com.xdandroid.sample;
  */
 
 public interface Callback {
-    public void execute();
+    public void execute(String result);
 }
