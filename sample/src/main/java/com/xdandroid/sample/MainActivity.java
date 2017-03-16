@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
         );
         findViewById(R.id.btn_address).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //txtSocket.setText(App.URL_SOCKET);
+                getUrl();
             }
         });
         txtSocket = (TextView) findViewById(R.id.txt_socket);
@@ -47,10 +47,23 @@ public class MainActivity extends Activity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        //txtSocket.setText(App.URL_SOCKET);
+        txtSocket.setText(TraceServiceImpl.URL_SOCKET);
     }
 
     //防止华为机型未加入白名单时按返回键回到桌面再锁屏后几秒钟进程被杀
     @Override public void onBackPressed() { IntentWrapper.onBackPressed(this); }
+
+    public void getUrl(){
+        AsyncTextViewLoader textViewLoader = new AsyncTextViewLoader(MainActivity.this,new Callback(){
+
+            @Override
+            public void execute(String result) {
+                TraceServiceImpl.URL_SOCKET = result;
+                txtSocket.setText(result);
+            }
+
+        });
+        textViewLoader.execute();
+    }
 
 }

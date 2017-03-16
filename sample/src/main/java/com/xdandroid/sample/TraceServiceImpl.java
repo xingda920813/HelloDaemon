@@ -22,7 +22,7 @@ import rx.functions.*;
 
 public class TraceServiceImpl extends AbsWorkService {
     private WebSocketClient cc = null;
-    private String URL_SOCKET = "";
+    public static String URL_SOCKET = "";
     //是否 任务完成, 不再需要服务运行?
     public static boolean sShouldStopService;
     public static Subscription sSubscription;
@@ -66,28 +66,32 @@ public class TraceServiceImpl extends AbsWorkService {
 
                         if(App.isNetworkAvailable(TraceServiceImpl.this)){
                             if(cc==null){
-                                if(URL_SOCKET.isEmpty())
+                                if(URL_SOCKET.isEmpty()) {
+                                    App.STATUS = "get url";
                                     getUrl();
-                                else
+                                }
+                                else {
+                                    App.STATUS = "create socket";
                                     cc = createSocket(URL_SOCKET);
+                                }
                             }else{
                                 try {
-                                    if(cc.getReadyState() == WebSocket.READYSTATE.OPEN) {
-                                        if(count%6==0){
-                                            System.out.println("tick on");
-                                            cc.send("tick on");
-                                            App.STATUS = "tick on";
-                                        }
-                                    }else{
-                                        cc.connect();
+                                    if(count%6==0) {
+                                        System.out.println("tick on");
+                                        cc.send("tick on");
+                                        App.STATUS = "tick on";
                                     }
                                 } catch (Exception exp) {
+                                    cc.close();
                                     URL_SOCKET = "";
                                     cc = null;
+                                    App.STATUS = exp.getMessage();
                                     exp.printStackTrace();
                                 }
                             }
                         }else{
+                            if(cc!=null)
+                                cc.close();
                             App.STATUS = "network is error";
                             System.out.println("network is error");
                             URL_SOCKET = "";
@@ -130,6 +134,9 @@ public class TraceServiceImpl extends AbsWorkService {
             @Override
             public void execute(String result) {
                 URL_SOCKET = result;
+
+                App.STATUS = "create socket";
+                cc = createSocket(URL_SOCKET);
             }
         });
         textViewLoader.execute();
@@ -157,6 +164,7 @@ public class TraceServiceImpl extends AbsWorkService {
         @Override
         public void onMessage(String message) {
             System.out.println(message);
+            App.STATUS = "onMessage";
             String title = "title";
             String content = message;
             try {
