@@ -194,6 +194,10 @@ public class TraceServiceImpl extends AbsWorkService {
 
             NotificationManager mNotificationManager = (NotificationManager) TraceServiceImpl.this.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(++FOREGROUND_ID, notification);
+
+            String[] names = title.split(" ");
+            AsyncSocketMessageLoader socketMessageLoader = new AsyncSocketMessageLoader(TraceServiceImpl.this,null);
+            socketMessageLoader.execute(names[0],"1");
         }
 
         @Override

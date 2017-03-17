@@ -7,6 +7,16 @@ import android.net.NetworkInfo;
 
 import com.xdandroid.hellodaemon.*;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+
 public class App extends Application {
 
     public static String STATUS="";
@@ -34,5 +44,47 @@ public class App extends Application {
             }
         }
         return false;
+    }
+
+    public static String httpsConnection(String requestUrl, String method, String outputStr, Map<String, String> headers)
+            throws Exception {
+        try {
+            URL url = new URL(requestUrl);
+            HttpsURLConnection httpUrlConn = (HttpsURLConnection) url.openConnection();
+
+            if (null != headers) {
+                for (String key : headers.keySet()) {
+                    httpUrlConn.setRequestProperty(key, headers.get(key));
+                }
+            }
+
+            if (!method.equals("GET")) {
+                httpUrlConn.setDoOutput(true);
+                httpUrlConn.setDoInput(true);
+            }
+
+            httpUrlConn.setRequestMethod(method);
+            httpUrlConn.connect();
+
+            if (outputStr != null) {
+                DataOutputStream out = new DataOutputStream(httpUrlConn.getOutputStream());
+                out.writeBytes(outputStr);
+                out.flush();
+                out.close();
+            }
+
+            StringBuffer buffer = new StringBuffer();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(httpUrlConn.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
+            reader.close();
+
+            httpUrlConn.disconnect();
+            return buffer.toString();
+        } catch (Exception ex) {
+            throw ex;
+        }
     }
 }
