@@ -10,18 +10,21 @@
         android:id="@+id/btn_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="启动服务"/>
+        android:text="启动服务"
+        android:onClick="onClick"/>
 
     <Button
         android:id="@+id/btn_white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="跳转自启动管理"/>
+        android:text="跳转自启动管理"
+        android:onClick="onClick"/>
 
     <Button
         android:id="@+id/btn_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="停止服务"/>
+        android:text="停止服务"
+        android:onClick="onClick"/>
 
 </LinearLayout>

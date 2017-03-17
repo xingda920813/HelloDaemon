@@ -19,8 +19,6 @@ public class WatchDogService extends Service {
     protected static Subscription sSubscription;
     protected static PendingIntent sPendingIntent;
 
-    protected boolean mFirstStarted = true;
-
     /**
      * 守护服务，运行在:watch子进程中
      */
@@ -28,15 +26,12 @@ public class WatchDogService extends Service {
 
         if (!DaemonEnv.sInitialized) return START_STICKY;
 
-        if(mFirstStarted) {
-            mFirstStarted = false;
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                startForeground(HASH_CODE, new Notification());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(DaemonEnv.sApp, WatchDogNotificationService.class));
-            }
-        }
-
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+            startForeground(HASH_CODE, new Notification());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(DaemonEnv.sApp, WatchDogNotificationService.class));
+        }
 
         //定时检查 AbsWorkService 是否在运行，如果不在运行就把它拉起来
         //Android 5.0+ 使用 JobScheduler，效果比 AlarmManager 好
@@ -59,7 +54,7 @@ public class WatchDogService extends Service {
         //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
         sSubscription = Observable.interval(DaemonEnv.getWakeUpInterval(), TimeUnit.MILLISECONDS)
                 .subscribe(new Action1<Long>() {
-                    public void call(Long aLong) {WatchDogService.this.startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));}
+                    public void call(Long aLong) {startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));}
                 }, new Action1<Throwable>() {
                     public void call(Throwable t) {t.printStackTrace();}
                 });

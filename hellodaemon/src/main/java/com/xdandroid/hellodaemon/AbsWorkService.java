@@ -43,16 +43,6 @@ public abstract class AbsWorkService extends Service {
      * 5.守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用.
      */
     protected int onStart(Intent intent, int flags, int startId) {
-        if(mFirstStarted) {
-            mFirstStarted = false;
-            //启动前台服务而不显示通知的漏洞已在 API Level 25 修复，大快人心！
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-                //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
-                startForeground(HASH_CODE, new Notification());
-                //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(getApplication(), WorkNotificationService.class));
-            }
-        }
 
         //启动守护服务，运行在:watch子进程中
         startService(new Intent(getApplication(), WatchDogService.class));
@@ -63,8 +53,18 @@ public abstract class AbsWorkService extends Service {
             if (shouldStopService) stopService(intent, flags, startId); else startService(intent, flags, startId);
         }
 
-        getPackageManager().setComponentEnabledSetting(new ComponentName(getPackageName(), WatchDogService.class.getName()),
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        if (mFirstStarted) {
+            mFirstStarted = false;
+            //启动前台服务而不显示通知的漏洞已在 API Level 25 修复，大快人心！
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+                //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
+                startForeground(HASH_CODE, new Notification());
+                //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(getApplication(), WorkNotificationService.class));
+            }
+            getPackageManager().setComponentEnabledSetting(new ComponentName(getPackageName(), WatchDogService.class.getName()),
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        }
 
         return START_STICKY;
     }

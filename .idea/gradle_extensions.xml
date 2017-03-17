@@ -203,7 +203,7 @@
             <prop name="siteUrl">https://github.com/xingda920813/HelloDaemon</prop>
             <prop name="developerEmail">570396198@qq.com</prop>
             <prop name="publishedGroupId">com.xdandroid</prop>
-            <prop name="libraryVersion">1.0.2</prop>
+            <prop name="libraryVersion">1.0.3</prop>
             <prop name="artifact">hellodaemon</prop>
             <prop name="developerId">xingda920813</prop>
             <prop name="developerName">Da Xing</prop>
