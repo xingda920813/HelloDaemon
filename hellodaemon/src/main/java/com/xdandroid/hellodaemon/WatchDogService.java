@@ -19,6 +19,8 @@ public class WatchDogService extends Service {
     protected static Subscription sSubscription;
     protected static PendingIntent sPendingIntent;
 
+    protected boolean mFirstStarted = true;
+
     /**
      * 守护服务，运行在:watch子进程中
      */
@@ -26,9 +28,12 @@ public class WatchDogService extends Service {
 
         if (!DaemonEnv.sInitialized) return START_STICKY;
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-            startForeground(HASH_CODE, new Notification());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(DaemonEnv.sApp, WatchDogNotificationService.class));
+        if(mFirstStarted) {
+            mFirstStarted = false;
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+                startForeground(HASH_CODE, new Notification());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(DaemonEnv.sApp, WatchDogNotificationService.class));
+            }
         }
 
         if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;

@@ -10,6 +10,8 @@ public abstract class AbsWorkService extends Service {
 
     protected static final int HASH_CODE = 1;
 
+    protected boolean mFirstStarted = true;
+
     /**
      * 用于在不需要服务运行的时候取消 Job / Alarm / Subscription.
      */
@@ -41,12 +43,15 @@ public abstract class AbsWorkService extends Service {
      * 5.守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用.
      */
     protected int onStart(Intent intent, int flags, int startId) {
-        //启动前台服务而不显示通知的漏洞已在 API Level 25 修复，大快人心！
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
-            //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
-            startForeground(HASH_CODE, new Notification());
-            //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(getApplication(), WorkNotificationService.class));
+        if(mFirstStarted) {
+            mFirstStarted = false;
+            //启动前台服务而不显示通知的漏洞已在 API Level 25 修复，大快人心！
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+                //利用漏洞在 API Level 17 及以下的 Android 系统中，启动前台服务而不显示通知
+                startForeground(HASH_CODE, new Notification());
+                //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) startService(new Intent(getApplication(), WorkNotificationService.class));
+            }
         }
 
         //启动守护服务，运行在:watch子进程中

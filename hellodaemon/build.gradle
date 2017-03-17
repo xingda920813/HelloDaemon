@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/xingda920813/HelloDaemon'
     gitUrl = 'https://github.com/xingda920813/HelloDaemon.git'
 
-    libraryVersion = '1.0.1'
+    libraryVersion = '1.0.2'
 
     developerId = 'xingda920813'
     developerName = 'Da Xing'
@@ -31,8 +31,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 3
+        versionName "1.0.2"
     }
     buildTypes {
         release {
@@ -49,16 +49,6 @@ dependencies {
     compile 'io.reactivex:rxjava:+'
     compile 'com.android.support:support-annotations:+'
 }
-
-task makeJar(type: Copy) {
-    delete 'build/libs/HelloDaemon-1.0.1.jar'
-    from('build/intermediates/bundles/default/')
-    into('build/libs/')
-    include('classes.jar')
-    rename ('classes.jar', 'HelloDaemon-1.0.1.jar')
-}
-
-makeJar.dependsOn(build)
 
 // Place it at the end of the file
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
