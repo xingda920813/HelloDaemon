@@ -11,7 +11,7 @@
 
 ## 实现了上面 2 个链接中的大多数保活思路 :
 
-#### 1、将Service设置为前台服务而不显示通知
+#### 1. 将Service设置为前台服务而不显示通知
 
 > D-clock :  
 >  
@@ -33,11 +33,11 @@
 
 onDestroy 方法只在 设置 -> 开发者选项 -> 正在运行的服务 里停止服务时才会回调。
 
-#### 2.在 Service 的 onStartCommand 方法里返回 START_STICKY
+#### 2. 在 Service 的 onStartCommand 方法里返回 START_STICKY
 
-#### 3.覆盖 Service 的 onDestroy/onTaskRemoved 方法, 保存数据到磁盘, 然后重新拉起服务
+#### 3. 覆盖 Service 的 onDestroy/onTaskRemoved 方法, 保存数据到磁盘, 然后重新拉起服务
 
-#### 4.监听 8 种系统广播 :
+#### 4. 监听 8 种系统广播 :
 
 CONNECTIVITY\_CHANGE, USER\_PRESENT, ACTION\_POWER\_CONNECTED, ACTION\_POWER\_DISCONNECTED, BOOT\_COMPLETED, PACKAGE\_ADDED, PACKAGE\_REMOVED.
 
@@ -45,9 +45,9 @@ CONNECTIVITY\_CHANGE, USER\_PRESENT, ACTION\_POWER\_CONNECTED, ACTION\_POWER\_DI
 
 Service 内部做了判断，若 Service 已在运行，不会重复启动.
 
-#### 5.开启守护服务 : 定时检查服务是否在运行，如果不在运行就拉起来
+#### 5. 开启守护服务 : 定时检查服务是否在运行，如果不在运行就拉起来
 
-#### 6.守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用
+#### 6. 守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用
 
 详见上面的 2 个链接。
 
@@ -132,7 +132,7 @@ Android 4.4 及以下版本使用 AlarmManager.
 
 ## 引入
 
-### 1.添加二进制
+### 1. 添加二进制
 
 build.gradle 中添加
 
@@ -140,7 +140,7 @@ build.gradle 中添加
 compile 'com.xdandroid:hellodaemon:+'
 ```
 
-### 2.继承 AbsWorkService, 实现 6 个抽象方法
+### 2. 继承 AbsWorkService, 实现 6 个抽象方法
 
 ```
 /**
@@ -168,9 +168,9 @@ void onServiceKilled();
 
 别忘了在 Manifest 中注册这个 Service.
 
-### 3.自定义 Application
+### 3. 自定义 Application
 
-在 Application 的 onCreate() 中, 调用
+在 Application 的 `onCreate()` 中, 调用
 
 ```
 DaemonEnv.initialize(
@@ -183,7 +183,7 @@ Context.startService(new Intent(Context app, Class<? extends AbsWorkService> ser
 
 别忘了在 Manifest 中通过 android:name 使用这个自定义的 Application.
 
-### 4.API 说明
+### 4. API 说明
 
 #### 启动 Service:
 
@@ -193,15 +193,15 @@ Context.startService(new Intent(Context c, Class<? extends AbsWorkService> servi
 
 #### 停止 Service:
 
-在 ? extends AbsWorkService 中, 添加 stopService() 方法:
+在 ? extends AbsWorkService 中, 添加 `stopService()` 方法:
 
-1.操作自己维护的 flag, 使 shouldStopService() 返回 true;
+1.操作自己维护的 flag, 使 `shouldStopService()` 返回 `true`;
 
 2.调用自己的方法或第三方 SDK 提供的 API, 停止任务;
 
 3.调用 ```AbsWorkService.cancelJobAlarmSub()``` 取消 Job / Alarm / Subscription.
 
-需要停止服务时, 调用 ? extends AbsWorkService 上的 stopService() 即可.
+需要停止服务时, 调用 ? extends AbsWorkService 上的 `stopService()` 即可.
 
 #### 处理白名单:
 
@@ -218,6 +218,6 @@ void whiteListMatters(Activity a, String reason);
 void onBackPressed(Activity a);
 ```
 
-#### 为节省用户的电量, 当不再需要服务运行时, 可以调用 ```AbsWorkService.cancelJobAlarmSub()``` 取消定时唤醒的 Job / Alarm / Subscription, 并调用 stopService() 停止服务.
+#### 为节省用户的电量, 当不再需要服务运行时, 可以调用 ```AbsWorkService.cancelJobAlarmSub()``` 取消定时唤醒的 Job / Alarm / Subscription, 并调用 `stopService()` 停止服务.
 
 详见代码及注释。
