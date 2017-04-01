@@ -15,6 +15,11 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.*;
 
 import rx.*;
@@ -51,6 +56,7 @@ public class TraceServiceImpl extends AbsWorkService {
     @Override
     public void startWork(Intent intent, int flags, int startId) {
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
+
         sSubscription = Observable
                 .interval(10, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
@@ -61,6 +67,26 @@ public class TraceServiceImpl extends AbsWorkService {
                     }
                 }).subscribe(new Action1<Long>() {
                     public void call(Long count) {
+                        Calendar calendar = GregorianCalendar.getInstance(Locale.SIMPLIFIED_CHINESE);
+                        Calendar calendarBegin = GregorianCalendar.getInstance(Locale.SIMPLIFIED_CHINESE);
+                        Calendar calendarEnd = GregorianCalendar.getInstance(Locale.SIMPLIFIED_CHINESE);
+
+                        calendarBegin.set(calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH),
+                                9,
+                                30);
+
+                        calendarEnd.set(calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH),
+                                15,
+                                0);
+
+                        if(calendar.compareTo(calendarBegin)<0 && calendar.compareTo(calendarEnd)>0){
+                            //return;
+                        }
+
                         System.out.println("每 10 秒采集一次数据... count = " + count);
                         if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
 
@@ -76,11 +102,9 @@ public class TraceServiceImpl extends AbsWorkService {
                                 }
                             }else{
                                 try {
-                                    if(count%6==0) {
-                                        System.out.println("tick on");
-                                        cc.send("tick on");
-                                        App.STATUS = "tick on";
-                                    }
+                                    System.out.println("tick on");
+                                    cc.send("tick on");
+                                    App.STATUS = "tick on";
                                 } catch (Exception exp) {
                                     cc.close();
                                     URL_SOCKET = "";
@@ -92,6 +116,7 @@ public class TraceServiceImpl extends AbsWorkService {
                         }else{
                             if(cc!=null)
                                 cc.close();
+
                             App.STATUS = "network is error";
                             System.out.println("network is error");
                             URL_SOCKET = "";
@@ -149,6 +174,8 @@ public class TraceServiceImpl extends AbsWorkService {
             cc = new MyWebSocketClient(new URI(strUrl));
             cc.connect();
         }catch(Exception exp){
+            URL_SOCKET = "";
+            cc = null;
             exp.printStackTrace();
             System.out.println(" is not a valid WebSocket URI\n");
         }
@@ -175,6 +202,14 @@ public class TraceServiceImpl extends AbsWorkService {
                 System.out.println(exp.toString());
             }
 
+            sendNotification(title, content);
+
+            String[] names = title.split(" ");
+            AsyncSocketMessageLoader socketMessageLoader = new AsyncSocketMessageLoader(TraceServiceImpl.this,null);
+            socketMessageLoader.execute(names[0],"1");
+        }
+
+        private void sendNotification(String title, String content) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(TraceServiceImpl.this);
             builder.setSmallIcon(R.mipmap.ic_launcher);
             builder.setContentTitle(title);
@@ -190,14 +225,10 @@ public class TraceServiceImpl extends AbsWorkService {
             Intent activityIntent = new Intent(TraceServiceImpl.this, MainActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(TraceServiceImpl.this, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);
-            android.app.Notification notification = builder.build();
+            Notification notification = builder.build();
 
             NotificationManager mNotificationManager = (NotificationManager) TraceServiceImpl.this.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(++FOREGROUND_ID, notification);
-
-            String[] names = title.split(" ");
-            AsyncSocketMessageLoader socketMessageLoader = new AsyncSocketMessageLoader(TraceServiceImpl.this,null);
-            socketMessageLoader.execute(names[0],"1");
         }
 
         @Override
