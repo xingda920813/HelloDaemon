@@ -85,7 +85,7 @@ public class TraceServiceImpl extends AbsWorkService {
 
                         mNotificationManager.
 
-                        System.out.println("每 10 秒采集一次数据... count = " + count);
+                                System.out.println("每 10 秒采集一次数据... count = " + count);
                         if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
 
                         if(App.isNetworkAvailable(TraceServiceImpl.this)){
