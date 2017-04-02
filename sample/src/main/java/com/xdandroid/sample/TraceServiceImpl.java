@@ -28,6 +28,7 @@ public class TraceServiceImpl extends AbsWorkService {
     public static Subscription sSubscription;
     private int FOREGROUND_ID = 8000;
 
+
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
         sShouldStopService = true;
@@ -61,6 +62,29 @@ public class TraceServiceImpl extends AbsWorkService {
                     }
                 }).subscribe(new Action1<Long>() {
                     public void call(Long count) {
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(TraceServiceImpl.this);
+                        builder.setSmallIcon(R.mipmap.ic_launcher);
+                        String title = "Foreground";
+                        String text = "I am a foreground service";
+                        String info = "Content Info";
+                        builder.setContentTitle(title);
+                        builder.setContentText(text);
+                        builder.setContentInfo(info);
+                        builder.setWhen(System.currentTimeMillis());
+
+                        builder.setPriority(NotificationCompat.PRIORITY_MAX);
+                        builder.setOngoing(true);
+
+                        Intent activityIntent = new Intent(TraceServiceImpl.this, MainActivity.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(TraceServiceImpl.this, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        builder.setContentIntent(pendingIntent);
+                        Notification notification = builder.build();
+
+                        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationManager.notify(8000, notification);
+
+                        mNotificationManager.
+
                         System.out.println("每 10 秒采集一次数据... count = " + count);
                         if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
 
@@ -165,12 +189,15 @@ public class TraceServiceImpl extends AbsWorkService {
         public void onMessage(String message) {
             System.out.println(message);
             App.STATUS = "onMessage";
-            String title = "title";
-            String content = message;
+
+            String title = "";
+            String text = "";
+            String info = "Content Info";
+
             try {
                 JSONObject json = new JSONObject(message);
                 title = json.getString("title");
-                content = json.getString("message");
+                text = json.getString("message");
             } catch (Exception exp) {
                 System.out.println(exp.toString());
             }
@@ -178,8 +205,8 @@ public class TraceServiceImpl extends AbsWorkService {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(TraceServiceImpl.this);
             builder.setSmallIcon(R.mipmap.ic_launcher);
             builder.setContentTitle(title);
-            builder.setContentText(content);
-            builder.setContentInfo("message");
+            builder.setContentText(text);
+            builder.setContentInfo(info);
             builder.setWhen(System.currentTimeMillis());
 
             builder.setPriority(NotificationCompat.PRIORITY_MAX);
