@@ -1,20 +1,18 @@
 package com.xdandroid.sample;
 
-import android.app.*;
 import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.*;
 import android.os.*;
 import android.support.v7.app.NotificationCompat;
 
 import com.xdandroid.hellodaemon.*;
 
-import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-import org.json.JSONObject;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,8 +27,6 @@ public class TraceServiceImpl extends AbsWorkService {
     //是否 任务完成, 不再需要服务运行?
     public static boolean sShouldStopService;
     public static Subscription sSubscription;
-    private int FOREGROUND_ID = 8000;
-
 
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
@@ -39,8 +35,6 @@ public class TraceServiceImpl extends AbsWorkService {
         if (sSubscription != null) sSubscription.unsubscribe();
         //取消 Job / Alarm / Subscription
         cancelJobAlarmSub();
-
-        App.STATUS = "stopService";
     }
 
     /**
@@ -56,7 +50,7 @@ public class TraceServiceImpl extends AbsWorkService {
     public void startWork(Intent intent, int flags, int startId) {
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
         sSubscription = Observable
-                .interval(10, TimeUnit.SECONDS)
+                .interval(3, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
                 .doOnUnsubscribe(new Action0() {
                     public void call() {
@@ -130,7 +124,6 @@ public class TraceServiceImpl extends AbsWorkService {
 
     @Override
     public void stopWork(Intent intent, int flags, int startId) {
-
         stopService();
     }
 
@@ -153,7 +146,6 @@ public class TraceServiceImpl extends AbsWorkService {
     public void onServiceKilled(Intent rootIntent) {
         System.out.println("保存数据到磁盘。");
     }
-
     public void getUrl(){
         AsyncTextViewLoader textViewLoader = new AsyncTextViewLoader(TraceServiceImpl.this,new Callback(){
 
@@ -216,3 +208,4 @@ public class TraceServiceImpl extends AbsWorkService {
         }
     }
 }
+

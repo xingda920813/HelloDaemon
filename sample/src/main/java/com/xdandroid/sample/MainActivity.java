@@ -4,66 +4,24 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.view.*;
-import android.widget.TextView;
 
 import com.xdandroid.hellodaemon.*;
 
 public class MainActivity extends Activity {
-    private TextView txtSocket,txtSocketStatus;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.btn_start).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                startService(new Intent(MainActivity.this, TraceServiceImpl.class));
-            }
-        });
-        //处理白名单
-        findViewById(R.id.btn_white).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {IntentWrapper.whiteListMatters(MainActivity.this, "轨迹跟踪服务的持续运行");}
-        });
-        findViewById(R.id.btn_stop).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                TraceServiceImpl.stopService();
-            }
-        }
-        );
-        findViewById(R.id.btn_address).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                getUrl();
-            }
-        });
-        txtSocket = (TextView) findViewById(R.id.txt_socket);
-
-        findViewById(R.id.btn_view).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ((TextView) findViewById(R.id.txt_view)).setText(App.STATUS);
-            }
-        });
     }
 
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        txtSocket.setText(TraceServiceImpl.URL_SOCKET);
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_start: startService(new Intent(this, TraceServiceImpl.class)); break;
+            case R.id.btn_white: IntentWrapper.whiteListMatters(this, "轨迹跟踪服务的持续运行"); break;
+            case R.id.btn_stop: TraceServiceImpl.stopService(); break;
+        }
     }
 
     //防止华为机型未加入白名单时按返回键回到桌面再锁屏后几秒钟进程被杀
     @Override public void onBackPressed() { IntentWrapper.onBackPressed(this); }
-
-    public void getUrl(){
-        AsyncTextViewLoader textViewLoader = new AsyncTextViewLoader(MainActivity.this,new Callback(){
-
-            @Override
-            public void execute(String result) {
-                TraceServiceImpl.URL_SOCKET = result;
-                txtSocket.setText(result);
-            }
-
-        });
-        textViewLoader.execute();
-    }
-
 }

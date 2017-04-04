@@ -7,8 +7,6 @@ import android.net.NetworkInfo;
 
 import com.xdandroid.hellodaemon.*;
 
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -18,17 +16,14 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 public class App extends Application {
-
     public static String BROADCAST_MESSAGE="com.xdandroid.sample.message";
     public static String STATUS="";
-
     @Override
     public void onCreate() {
         super.onCreate();
         DaemonEnv.initialize(this, TraceServiceImpl.class, DaemonEnv.DEFAULT_WAKE_UP_INTERVAL);
         startService(new Intent(this, TraceServiceImpl.class));
     }
-
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivity = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -89,3 +84,4 @@ public class App extends Application {
         }
     }
 }
+
