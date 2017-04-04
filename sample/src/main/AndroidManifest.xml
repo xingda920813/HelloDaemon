@@ -18,7 +18,14 @@
         </activity>
 
         <service android:name=".TraceServiceImpl"/>
+        <receiver android:name=".MessageReceiver" >
+            <intent-filter>
+                <action android:name="com.xdandroid.sample.message" />
+            </intent-filter>
+        </receiver>
 
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 </manifest>

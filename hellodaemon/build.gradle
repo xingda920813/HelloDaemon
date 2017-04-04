@@ -46,7 +46,7 @@ android {
 }
 
 dependencies {
-    compile 'io.reactivex:rxjava:+'
+    compile group: 'io.reactivex', name: 'rxandroid', version: '1.2.1'
     compile 'com.android.support:support-annotations:+'
 }
 
