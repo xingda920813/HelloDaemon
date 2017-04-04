@@ -15,6 +15,9 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.*;
 
 import rx.*;
@@ -62,10 +65,11 @@ public class TraceServiceImpl extends AbsWorkService {
                     }
                 }).subscribe(new Action1<Long>() {
                     public void call(Long count) {
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(TraceServiceImpl.this);
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
                         builder.setSmallIcon(R.mipmap.ic_launcher);
-                        String title = "Foreground";
-                        String text = "I am a foreground service";
+                        DateFormat df = new SimpleDateFormat("HH:mm:ss");
+                        String title = new Date().toLocaleString();
+                        String text = App.STATUS;
                         String info = "Content Info";
                         builder.setContentTitle(title);
                         builder.setContentText(text);
@@ -75,17 +79,15 @@ public class TraceServiceImpl extends AbsWorkService {
                         builder.setPriority(NotificationCompat.PRIORITY_MAX);
                         builder.setOngoing(true);
 
-                        Intent activityIntent = new Intent(TraceServiceImpl.this, MainActivity.class);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(TraceServiceImpl.this, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        Intent activityIntent = new Intent(getApplicationContext(), MainActivity.class);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder.setContentIntent(pendingIntent);
                         Notification notification = builder.build();
 
                         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                         mNotificationManager.notify(8000, notification);
 
-                        mNotificationManager.
-
-                                System.out.println("每 10 秒采集一次数据... count = " + count);
+                        System.out.println("每 10 秒采集一次数据... count = " + count);
                         if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
 
                         if(App.isNetworkAvailable(TraceServiceImpl.this)){
@@ -190,41 +192,9 @@ public class TraceServiceImpl extends AbsWorkService {
             System.out.println(message);
             App.STATUS = "onMessage";
 
-            String title = "";
-            String text = "";
-            String info = "Content Info";
-
-            try {
-                JSONObject json = new JSONObject(message);
-                title = json.getString("title");
-                text = json.getString("message");
-            } catch (Exception exp) {
-                System.out.println(exp.toString());
-            }
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(TraceServiceImpl.this);
-            builder.setSmallIcon(R.mipmap.ic_launcher);
-            builder.setContentTitle(title);
-            builder.setContentText(text);
-            builder.setContentInfo(info);
-            builder.setWhen(System.currentTimeMillis());
-
-            builder.setPriority(NotificationCompat.PRIORITY_MAX);
-            builder.setAutoCancel(true);
-
-            builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
-
-            Intent activityIntent = new Intent(TraceServiceImpl.this, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(TraceServiceImpl.this, 1, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.setContentIntent(pendingIntent);
-            android.app.Notification notification = builder.build();
-
-            NotificationManager mNotificationManager = (NotificationManager) TraceServiceImpl.this.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(++FOREGROUND_ID, notification);
-
-            String[] names = title.split(" ");
-            AsyncSocketMessageLoader socketMessageLoader = new AsyncSocketMessageLoader(TraceServiceImpl.this,null);
-            socketMessageLoader.execute(names[0],"1");
+            Intent intent = new Intent(App.BROADCAST_MESSAGE);
+            intent.putExtra("message",message);
+            sendBroadcast(intent);
         }
 
         @Override

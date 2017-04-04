@@ -12,11 +12,9 @@ import java.net.URL;
 
 public class AsyncSocketMessageLoader extends AsyncTask<String, Integer, Boolean> {
 
-    private Context context;
     private Callback callback;
 
-    public AsyncSocketMessageLoader(Context context, Callback callback) {
-        this.context = context;
+    public AsyncSocketMessageLoader(Callback callback) {
         this.callback = callback;
     }
 

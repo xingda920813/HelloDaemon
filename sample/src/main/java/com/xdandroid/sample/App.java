@@ -19,6 +19,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class App extends Application {
 
+    public static String BROADCAST_MESSAGE="com.xdandroid.sample.message";
     public static String STATUS="";
 
     @Override
