@@ -115,6 +115,7 @@ public class TraceServiceImpl extends AbsWorkService {
                         System.out.println("unknown error");
                         URL_SOCKET = "";
                         cc = null;
+                        createSinaSocketClient();
                     }
                 }else{
                     if(cc!=null)
