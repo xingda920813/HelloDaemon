@@ -4,6 +4,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.*;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.*;
 import android.support.v7.app.NotificationCompat;
 
@@ -13,10 +15,14 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,8 +40,6 @@ import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
-
-
 public class TraceServiceImpl extends AbsWorkService {
     private int FOREGROUND_ID = 8001;
     private WebSocketClient cc = null;
@@ -43,7 +47,6 @@ public class TraceServiceImpl extends AbsWorkService {
     //是否 任务完成, 不再需要服务运行?
     public static boolean sShouldStopService;
     public static CompositeDisposable disposables;
-    public static CompositeDisposable disposablesSina;
 
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
@@ -69,14 +72,18 @@ public class TraceServiceImpl extends AbsWorkService {
 
     private DisposableObserver<Long> getObserver() {
         return new DisposableObserver<Long>() {
-
             @Override
             public void onNext(Long value) {
+                if(MainActivity.STATUS.isEmpty()){
+                    Intent intent = new Intent(TraceServiceImpl.this, MainActivity.class);
+                    startActivity(intent);
+                }
+
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
                 builder.setSmallIcon(R.mipmap.ic_launcher);
                 DateFormat df = new SimpleDateFormat("HH:mm:ss");
                 String title = new Date().toLocaleString();
-                String text = App.STATUS;
+                String text = MainActivity.STATUS;
                 String info = "Content Info";
                 builder.setContentTitle(title);
                 builder.setContentText(text);
@@ -97,21 +104,21 @@ public class TraceServiceImpl extends AbsWorkService {
                 System.out.println("每 10 秒采集一次数据... count = " + value);
                 if (value > 0 && value % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (value / 18 - 1));
 
-                if(App.isNetworkAvailable(TraceServiceImpl.this)){
+                if(isNetworkAvailable(TraceServiceImpl.this)){
                     if(cc==null){
                         createSinaSocketClient();
                     }else if(cc.getReadyState() == WebSocket.READYSTATE.OPEN){
                         try {
                             System.out.println("tick on");
                             cc.send("tick on");
-                            App.STATUS = "tick on";
+                            MainActivity.STATUS = "tick on";
                         } catch (Exception exp) {
-                            App.STATUS = exp.getMessage();
+                            MainActivity.STATUS = exp.getMessage();
                             exp.printStackTrace();
                         }
                     } else{
                         cc.close();
-                        App.STATUS = "unknown error";
+                        MainActivity.STATUS = "unknown error";
                         System.out.println("unknown error");
                         URL_SOCKET = "";
                         cc = null;
@@ -120,7 +127,7 @@ public class TraceServiceImpl extends AbsWorkService {
                 }else{
                     if(cc!=null)
                         cc.close();
-                    App.STATUS = "network is error";
+                    MainActivity.STATUS = "network is error";
                     System.out.println("network is error");
                     URL_SOCKET = "";
                     cc = null;
@@ -129,12 +136,12 @@ public class TraceServiceImpl extends AbsWorkService {
 
             @Override
             public void onError(Throwable e) {
-                App.STATUS = "onError";
+                MainActivity.STATUS = "onError";
             }
 
             @Override
             public void onComplete() {
-                App.STATUS = "onComplete";
+                MainActivity.STATUS = "onComplete";
             }
         };
     }
@@ -144,10 +151,8 @@ public class TraceServiceImpl extends AbsWorkService {
             @Override
             public void accept(String result) throws Exception {
                 URL_SOCKET = result;
-                App.STATUS = "create socket";
+                MainActivity.STATUS = "create socket";
                 cc = createSocket(URL_SOCKET);
-
-                int test = 1;
             }
         };
     }
@@ -165,13 +170,11 @@ public class TraceServiceImpl extends AbsWorkService {
     }
 
     public void createSinaSocketClient(){
-        disposablesSina = new CompositeDisposable();
-
-        disposables.add(Flowable.fromCallable(new Callable<String>(){
+        Flowable.fromCallable(new Callable<String>(){
 
             @Override
             public String call() throws Exception {
-                return App.getSocketUrl();
+                return getSocketUrl();
             }
         }).filter(new Predicate<String>() {
             @Override
@@ -182,7 +185,65 @@ public class TraceServiceImpl extends AbsWorkService {
                     return true;
             }
         }).subscribeOn(Schedulers.io())
-        .observeOn(Schedulers.io()).subscribe(getSocketConsumer()));
+        .observeOn(AndroidSchedulers.mainThread()).subscribe(getSocketConsumer());
+    }
+
+    public boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivity = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo info = connectivity.getActiveNetworkInfo();
+            if (info != null && info.isConnected())
+            {
+                // 当前网络是连接的
+                if (info.getState() == NetworkInfo.State.CONNECTED)
+                {
+                    // 当前所连接的网络可用
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+
+    public String getSocketUrl(){
+        String strUrl = "http://ichess.sinaapp.com/ext/channel.php";
+        String txtResult = "";
+        try {
+            //创建URL对象
+            URL url = new URL(strUrl);//Get请求可以在Url中带参数： ①url + "?bookname=" + name;②url="http://www.baidu.com?name=zhang&pwd=123";
+            //返回一个URLConnection对象，它表示到URL所引用的远程对象的连接
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            //在这里设置一些属性，详细见UrlConnection文档，HttpURLConnection是UrlConnection的子类
+            //设置连接超时为5秒
+            httpURLConnection.setConnectTimeout(5000);
+            //设定请求方式(默认为get)
+            httpURLConnection.setRequestMethod("GET");
+            //建立到远程对象的实际连接
+            httpURLConnection.connect();
+            //返回打开连接读取的输入流，输入流转化为StringBuffer类型，这一套流程要记住，常用
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            String line = null;
+            StringBuffer stringBuffer = new StringBuffer();
+            while ((line = bufferedReader.readLine()) != null) {
+                //转化为UTF-8的编码格式
+                line = new String(line.getBytes("UTF-8"));
+                stringBuffer.append(line);
+            }
+            txtResult = stringBuffer.toString();
+            bufferedReader.close();
+            httpURLConnection.disconnect();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return txtResult;
     }
 
     @Override
@@ -209,19 +270,6 @@ public class TraceServiceImpl extends AbsWorkService {
     public void onServiceKilled(Intent rootIntent) {
         System.out.println("保存数据到磁盘。");
     }
-    public void getUrl(){
-        AsyncTextViewLoader textViewLoader = new AsyncTextViewLoader(TraceServiceImpl.this,new Callback(){
-
-            @Override
-            public void execute(String result) {
-                URL_SOCKET = result;
-
-                App.STATUS = "create socket";
-                //cc = createSocket(URL_SOCKET);
-            }
-        });
-        textViewLoader.execute();
-    }
 
     private WebSocketClient createSocket(String strUrl){
 
@@ -245,7 +293,7 @@ public class TraceServiceImpl extends AbsWorkService {
         @Override
         public void onMessage(String message) {
             System.out.println(message);
-            App.STATUS = "onMessage";
+            MainActivity.STATUS = "onMessage";
 
             String title = "";
             String text = "";
@@ -279,8 +327,7 @@ public class TraceServiceImpl extends AbsWorkService {
                 startService(new Intent(getApplicationContext(), TraceServiceImpl.class));
 
                 String[] names = title.split(" ");
-                AsyncSocketMessageLoader socketMessageLoader = new AsyncSocketMessageLoader(null);
-                socketMessageLoader.execute(names[0],"1");
+                changeStockStatus(names[0],"1");
             } catch (Exception exp) {
                 System.out.println(exp.toString());
             }
@@ -289,19 +336,59 @@ public class TraceServiceImpl extends AbsWorkService {
         @Override
         public void onOpen(ServerHandshake handshake) {
             System.out.println("onOpen");
-            App.STATUS = "onOpen";
+            MainActivity.STATUS = "onOpen";
         }
 
         @Override
         public void onClose(int code, String reason, boolean remote) {
             System.out.println("onClose");
-            App.STATUS = "onClose";
+            MainActivity.STATUS = "onClose";
         }
 
         @Override
         public void onError(Exception ex) {
             System.out.println("onError");
-            App.STATUS = "onError";
+            MainActivity.STATUS = "onError";
+        }
+
+        private boolean changeStockStatus(String code,String flag){
+            String urlFormatter = "http://ichess.sinaapp.com/ext/update.php?code=%s&flag=%s";
+            String strUrl = String.format(urlFormatter,code,flag);
+
+            try {
+                //创建URL对象
+                URL url = new URL(strUrl);//Get请求可以在Url中带参数： ①url + "?bookname=" + name;②url="http://www.baidu.com?name=zhang&pwd=123";
+                //返回一个URLConnection对象，它表示到URL所引用的远程对象的连接
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                //在这里设置一些属性，详细见UrlConnection文档，HttpURLConnection是UrlConnection的子类
+                //设置连接超时为5秒
+                httpURLConnection.setConnectTimeout(5000);
+                //设定请求方式(默认为get)
+                httpURLConnection.setRequestMethod("GET");
+                //建立到远程对象的实际连接
+                httpURLConnection.connect();
+                //返回打开连接读取的输入流，输入流转化为StringBuffer类型，这一套流程要记住，常用
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                String line = null;
+                StringBuffer stringBuffer = new StringBuffer();
+                while ((line = bufferedReader.readLine()) != null) {
+                    //转化为UTF-8的编码格式
+                    line = new String(line.getBytes("UTF-8"));
+                    stringBuffer.append(line);
+                }
+                String txtResult = stringBuffer.toString();
+                bufferedReader.close();
+                httpURLConnection.disconnect();
+                return true;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+            return false;
         }
     }
 }
