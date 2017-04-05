@@ -32,13 +32,13 @@ public class TraceServiceImpl extends AbsWorkService {
     public static String URL_SOCKET = "";
     //是否 任务完成, 不再需要服务运行?
     public static boolean sShouldStopService;
-    public final static CompositeDisposable disposables = new CompositeDisposable();
+    public static CompositeDisposable disposables;
 
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
         sShouldStopService = true;
         //取消对任务的订阅
-        if (disposables != null) disposables.clear();
+        if (disposables != null) disposables.dispose();
         //取消 Job / Alarm / Subscription
         cancelJobAlarmSub();
     }
@@ -134,7 +134,7 @@ public class TraceServiceImpl extends AbsWorkService {
     @Override
     public void startWork(Intent intent, int flags, int startId) {
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
-
+        disposables = new CompositeDisposable();
         disposables.add(getObservable()
                 // Run on a background thread
                 .subscribeOn(Schedulers.io())
