@@ -9,6 +9,7 @@ import android.support.v7.app.NotificationCompat;
 
 import com.xdandroid.hellodaemon.*;
 
+import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
@@ -32,6 +33,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
+
 
 
 public class TraceServiceImpl extends AbsWorkService {
@@ -62,7 +64,7 @@ public class TraceServiceImpl extends AbsWorkService {
     }
 
     private Observable<? extends Long> getObservable() {
-        return Observable.interval(0, 60, TimeUnit.SECONDS);
+        return Observable.interval(0, 10, TimeUnit.SECONDS);
     }
 
     private DisposableObserver<Long> getObserver() {
@@ -98,41 +100,22 @@ public class TraceServiceImpl extends AbsWorkService {
                 if(App.isNetworkAvailable(TraceServiceImpl.this)){
                     if(cc==null){
                         createSinaSocketClient();
-                    }else{
+                    }else if(cc.getReadyState() == WebSocket.READYSTATE.OPEN){
                         try {
                             System.out.println("tick on");
                             cc.send("tick on");
                             App.STATUS = "tick on";
                         } catch (Exception exp) {
-                            cc.close();
-                            URL_SOCKET = "";
-                            cc = null;
                             App.STATUS = exp.getMessage();
                             exp.printStackTrace();
                         }
+                    } else{
+                        cc.close();
+                        App.STATUS = "unknown error";
+                        System.out.println("unknown error");
+                        URL_SOCKET = "";
+                        cc = null;
                     }
-//                    if(cc==null){
-//                        if(URL_SOCKET.isEmpty()) {
-//                            App.STATUS = "get url";
-//                            getUrl();
-//                        }
-//                        else {
-//                            App.STATUS = "create socket";
-//                            cc = createSocket(URL_SOCKET);
-//                        }
-//                    }else{
-//                        try {
-//                            System.out.println("tick on");
-//                            cc.send("tick on");
-//                            App.STATUS = "tick on";
-//                        } catch (Exception exp) {
-//                            cc.close();
-//                            URL_SOCKET = "";
-//                            cc = null;
-//                            App.STATUS = exp.getMessage();
-//                            exp.printStackTrace();
-//                        }
-//                    }
                 }else{
                     if(cc!=null)
                         cc.close();
@@ -162,6 +145,8 @@ public class TraceServiceImpl extends AbsWorkService {
                 URL_SOCKET = result;
                 App.STATUS = "create socket";
                 cc = createSocket(URL_SOCKET);
+
+                int test = 1;
             }
         };
     }
@@ -231,7 +216,7 @@ public class TraceServiceImpl extends AbsWorkService {
                 URL_SOCKET = result;
 
                 App.STATUS = "create socket";
-                cc = createSocket(URL_SOCKET);
+                //cc = createSocket(URL_SOCKET);
             }
         });
         textViewLoader.execute();
