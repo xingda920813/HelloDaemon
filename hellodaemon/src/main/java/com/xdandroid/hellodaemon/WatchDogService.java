@@ -9,14 +9,17 @@ import android.os.*;
 
 import java.util.concurrent.*;
 
-import rx.*;
-import rx.functions.*;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class WatchDogService extends Service {
 
     protected static final int HASH_CODE = 2;
 
-    protected static Subscription sSubscription;
+    protected static CompositeDisposable disposables;
     protected static PendingIntent sPendingIntent;
 
     /**
@@ -26,7 +29,7 @@ public class WatchDogService extends Service {
 
         if (!DaemonEnv.sInitialized) return START_STICKY;
 
-        if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
+        if (disposables != null && !disposables.isDisposed()) return START_STICKY;
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             startForeground(HASH_CODE, new Notification());
@@ -52,18 +55,42 @@ public class WatchDogService extends Service {
         }
 
         //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
-        sSubscription = Observable.interval(DaemonEnv.getWakeUpInterval(), TimeUnit.MILLISECONDS)
-                .subscribe(new Action1<Long>() {
-                    public void call(Long aLong) {startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));}
-                }, new Action1<Throwable>() {
-                    public void call(Throwable t) {t.printStackTrace();}
-                });
+        disposables.add(getObservable()
+                // Run on a background thread
+                .subscribeOn(Schedulers.io())
+                // Be notified on the main thread
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(getObserver()));
 
         //守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用
         getPackageManager().setComponentEnabledSetting(new ComponentName(getPackageName(), DaemonEnv.sServiceClass.getName()),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 
         return START_STICKY;
+    }
+
+    private Observable<? extends Long> getObservable() {
+        return Observable.interval(0, DaemonEnv.getWakeUpInterval(), TimeUnit.MILLISECONDS);
+    }
+
+    private DisposableObserver<Long> getObserver() {
+        return new DisposableObserver<Long>() {
+
+            @Override
+            public void onNext(Long value) {
+                startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
     }
 
     @Override
@@ -114,7 +141,7 @@ public class WatchDogService extends Service {
             AlarmManager am = (AlarmManager) DaemonEnv.sApp.getSystemService(ALARM_SERVICE);
             if (sPendingIntent != null) am.cancel(sPendingIntent);
         }
-        if (sSubscription != null) sSubscription.unsubscribe();
+        if (disposables != null) disposables.dispose();
     }
 
     public static class WatchDogNotificationService extends Service {
