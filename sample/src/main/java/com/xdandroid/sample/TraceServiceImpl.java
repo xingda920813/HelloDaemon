@@ -12,6 +12,8 @@ import com.xdandroid.hellodaemon.*;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.net.URI;
 import java.text.DateFormat;
@@ -19,9 +21,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.*;
 
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -33,6 +41,7 @@ public class TraceServiceImpl extends AbsWorkService {
     //是否 任务完成, 不再需要服务运行?
     public static boolean sShouldStopService;
     public static CompositeDisposable disposables;
+    public static CompositeDisposable disposablesSina;
 
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
@@ -53,7 +62,7 @@ public class TraceServiceImpl extends AbsWorkService {
     }
 
     private Observable<? extends Long> getObservable() {
-        return Observable.interval(0, 3, TimeUnit.SECONDS);
+        return Observable.interval(0, 60, TimeUnit.SECONDS);
     }
 
     private DisposableObserver<Long> getObserver() {
@@ -88,14 +97,7 @@ public class TraceServiceImpl extends AbsWorkService {
 
                 if(App.isNetworkAvailable(TraceServiceImpl.this)){
                     if(cc==null){
-                        if(URL_SOCKET.isEmpty()) {
-                            App.STATUS = "get url";
-                            getUrl();
-                        }
-                        else {
-                            App.STATUS = "create socket";
-                            cc = createSocket(URL_SOCKET);
-                        }
+                        createSinaSocketClient();
                     }else{
                         try {
                             System.out.println("tick on");
@@ -109,6 +111,28 @@ public class TraceServiceImpl extends AbsWorkService {
                             exp.printStackTrace();
                         }
                     }
+//                    if(cc==null){
+//                        if(URL_SOCKET.isEmpty()) {
+//                            App.STATUS = "get url";
+//                            getUrl();
+//                        }
+//                        else {
+//                            App.STATUS = "create socket";
+//                            cc = createSocket(URL_SOCKET);
+//                        }
+//                    }else{
+//                        try {
+//                            System.out.println("tick on");
+//                            cc.send("tick on");
+//                            App.STATUS = "tick on";
+//                        } catch (Exception exp) {
+//                            cc.close();
+//                            URL_SOCKET = "";
+//                            cc = null;
+//                            App.STATUS = exp.getMessage();
+//                            exp.printStackTrace();
+//                        }
+//                    }
                 }else{
                     if(cc!=null)
                         cc.close();
@@ -131,6 +155,17 @@ public class TraceServiceImpl extends AbsWorkService {
         };
     }
 
+    private Consumer<String> getSocketConsumer() {
+        return new Consumer<String>() {
+            @Override
+            public void accept(String result) throws Exception {
+                URL_SOCKET = result;
+                App.STATUS = "create socket";
+                cc = createSocket(URL_SOCKET);
+            }
+        };
+    }
+
     @Override
     public void startWork(Intent intent, int flags, int startId) {
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
@@ -141,7 +176,27 @@ public class TraceServiceImpl extends AbsWorkService {
                 // Be notified on the main thread
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(getObserver()));
+    }
 
+    public void createSinaSocketClient(){
+        disposablesSina = new CompositeDisposable();
+
+        disposables.add(Flowable.fromCallable(new Callable<String>(){
+
+            @Override
+            public String call() throws Exception {
+                return App.getSocketUrl();
+            }
+        }).filter(new Predicate<String>() {
+            @Override
+            public boolean test(String s) throws Exception {
+                if(s==null || s.trim().length()==0)
+                    return false;
+                else
+                    return true;
+            }
+        }).subscribeOn(Schedulers.io())
+        .observeOn(Schedulers.io()).subscribe(getSocketConsumer()));
     }
 
     @Override
@@ -205,10 +260,6 @@ public class TraceServiceImpl extends AbsWorkService {
         public void onMessage(String message) {
             System.out.println(message);
             App.STATUS = "onMessage";
-
-//            Intent intent = new Intent(App.BROADCAST_MESSAGE);
-//            intent.putExtra("message",message);
-//            sendBroadcast(intent);
 
             String title = "";
             String text = "";
