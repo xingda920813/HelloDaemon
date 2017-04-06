@@ -12,12 +12,13 @@ public class MainActivity extends Activity {
 
     private TextView txtSocket;
     public static String STATUS = "";
+    public static boolean EXIST_FLAG = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        STATUS = "onCreate";
+        EXIST_FLAG = true;
 
         findViewById(R.id.btn_start).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -52,6 +53,12 @@ public class MainActivity extends Activity {
     protected void onPostResume() {
         super.onPostResume();
         txtSocket.setText(TraceServiceImpl.URL_SOCKET);
+    }
+
+    @Override
+    protected void onDestroy() {
+        EXIST_FLAG = false;
+        super.onDestroy();
     }
 
     //防止华为机型未加入白名单时按返回键回到桌面再锁屏后几秒钟进程被杀

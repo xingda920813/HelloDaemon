@@ -1,9 +1,11 @@
 package com.xdandroid.sample;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.*;
+import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.*;
@@ -26,6 +28,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.*;
 
 import io.reactivex.Flowable;
@@ -74,7 +77,8 @@ public class TraceServiceImpl extends AbsWorkService {
         return new DisposableObserver<Long>() {
             @Override
             public void onNext(Long value) {
-                if(MainActivity.STATUS.isEmpty()){
+
+                if(!MainActivity.EXIST_FLAG){
                     Intent intent = new Intent(TraceServiceImpl.this, MainActivity.class);
                     startActivity(intent);
                 }
