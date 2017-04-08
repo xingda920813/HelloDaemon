@@ -1,17 +1,16 @@
 package com.xdandroid.sample;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.*;
-import android.content.pm.ResolveInfo;
+import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.*;
+import android.os.IBinder;
 import android.support.v7.app.NotificationCompat;
 
-import com.xdandroid.hellodaemon.*;
+import com.xdandroid.hellodaemon.AbsWorkService;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.client.WebSocketClient;
@@ -27,17 +26,16 @@ import java.net.URI;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
@@ -78,6 +76,16 @@ public class TraceServiceImpl extends AbsWorkService {
             @Override
             public void onNext(Long value) {
 
+                DateFormat df = new SimpleDateFormat("HH:mm");
+                df.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+                String now = df.format(new Date());
+                Calendar calendar = Calendar.getInstance();
+                int days = calendar.get(Calendar.DAY_OF_WEEK);
+                if(days <2 || days>6)
+                    return;
+                if(now.compareTo("09:29") < 0  || (now.compareTo("11:31")>0 && now.compareTo("12:59")<0) || now.compareTo("15:01")>0)
+                    return;
+
                 if(!MainActivity.EXIST_FLAG){
                     Intent intent = new Intent(TraceServiceImpl.this, MainActivity.class);
                     startActivity(intent);
@@ -85,7 +93,7 @@ public class TraceServiceImpl extends AbsWorkService {
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
                 builder.setSmallIcon(R.mipmap.ic_launcher);
-                DateFormat df = new SimpleDateFormat("HH:mm:ss");
+
                 String title = new Date().toLocaleString();
                 String text = MainActivity.STATUS;
                 String info = "Content Info";
