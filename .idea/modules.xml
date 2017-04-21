@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HelloDaemon.iml" filepath="$PROJECT_DIR$/HelloDaemon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HelloDaemon.iml" filepath="$PROJECT_DIR$/HelloDaemon.iml" />
       <module fileurl="file://$PROJECT_DIR$/hellodaemon/hellodaemon.iml" filepath="$PROJECT_DIR$/hellodaemon/hellodaemon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hellodaemon/hellodaemon.iml" filepath="$PROJECT_DIR$/hellodaemon/hellodaemon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
     </modules>
   </component>

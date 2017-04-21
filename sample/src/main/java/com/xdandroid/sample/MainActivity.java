@@ -16,7 +16,7 @@ public class MainActivity extends Activity {
 
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_start: startService(new Intent(this, TraceServiceImpl.class)); break;
+            case R.id.btn_start: try {startService(new Intent(this, TraceServiceImpl.class));} catch (Exception ignored) {} break;
             case R.id.btn_white: IntentWrapper.whiteListMatters(this, "轨迹跟踪服务的持续运行"); break;
             case R.id.btn_stop: TraceServiceImpl.stopService(); break;
         }
