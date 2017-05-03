@@ -7,20 +7,21 @@ import com.xdandroid.hellodaemon.*;
 
 import java.util.concurrent.*;
 
-import rx.*;
-import rx.functions.*;
+import io.reactivex.Flowable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.*;
 
 public class TraceServiceImpl extends AbsWorkService {
 
     //是否 任务完成, 不再需要服务运行?
     public static boolean sShouldStopService;
-    public static Subscription sSubscription;
+    public static Disposable sDisposable;
 
     public static void stopService() {
         //我们现在不再需要服务运行了, 将标志位置为 true
         sShouldStopService = true;
         //取消对任务的订阅
-        if (sSubscription != null) sSubscription.unsubscribe();
+        if (sDisposable != null) sDisposable.dispose();
         //取消 Job / Alarm / Subscription
         cancelJobAlarmSub();
     }
@@ -37,16 +38,18 @@ public class TraceServiceImpl extends AbsWorkService {
     @Override
     public void startWork(Intent intent, int flags, int startId) {
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
-        sSubscription = Observable
+        sDisposable = Flowable
                 .interval(3, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
-                .doOnUnsubscribe(new Action0() {
-                    public void call() {
+                .doOnTerminate(new Action() {
+                    @Override
+                    public void run() throws Exception {
                         System.out.println("保存数据到磁盘。");
                         cancelJobAlarmSub();
                     }
-                }).subscribe(new Action1<Long>() {
-                    public void call(Long count) {
+                }).subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long count) throws Exception {
                         System.out.println("每 3 秒采集一次数据... count = " + count);
                         if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
                     }
@@ -65,7 +68,7 @@ public class TraceServiceImpl extends AbsWorkService {
     @Override
     public Boolean isWorkRunning(Intent intent, int flags, int startId) {
         //若还没有取消订阅, 就说明任务仍在运行.
-        return sSubscription != null && !sSubscription.isUnsubscribed();
+        return sDisposable != null && !sDisposable.isDisposed();
     }
 
     @Override

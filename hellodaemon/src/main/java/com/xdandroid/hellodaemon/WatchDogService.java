@@ -1,22 +1,28 @@
 package com.xdandroid.hellodaemon;
 
-import android.app.*;
+import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.job.*;
-import android.content.*;
-import android.content.pm.*;
-import android.os.*;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.IBinder;
 
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 
-import rx.*;
-import rx.functions.*;
+import io.reactivex.Flowable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 public class WatchDogService extends Service {
 
     protected static final int HASH_CODE = 2;
 
-    protected static Subscription sSubscription;
+    protected static Disposable sDisposable;
     protected static PendingIntent sPendingIntent;
 
     /**
@@ -26,7 +32,7 @@ public class WatchDogService extends Service {
 
         if (!DaemonEnv.sInitialized) return START_STICKY;
 
-        if (sSubscription != null && !sSubscription.isUnsubscribed()) return START_STICKY;
+        if (sDisposable != null && !sDisposable.isDisposed()) return START_STICKY;
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             startForeground(HASH_CODE, new Notification());
@@ -53,11 +59,18 @@ public class WatchDogService extends Service {
         }
 
         //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
-        sSubscription = Observable.interval(DaemonEnv.getWakeUpInterval(), TimeUnit.MILLISECONDS)
-                .subscribe(new Action1<Long>() {
-                    public void call(Long aLong) {startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));}
-                }, new Action1<Throwable>() {
-                    public void call(Throwable t) {t.printStackTrace();}
+        sDisposable = Flowable
+                .interval(DaemonEnv.getWakeUpInterval(), TimeUnit.MILLISECONDS)
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        throwable.printStackTrace();
+                    }
                 });
 
         //守护 Service 组件的启用状态, 使其不被 MAT 等工具禁用
@@ -115,7 +128,7 @@ public class WatchDogService extends Service {
             AlarmManager am = (AlarmManager) DaemonEnv.sApp.getSystemService(ALARM_SERVICE);
             if (sPendingIntent != null) am.cancel(sPendingIntent);
         }
-        if (sSubscription != null) sSubscription.unsubscribe();
+        if (sDisposable != null) sDisposable.dispose();
     }
 
     public static class WatchDogNotificationService extends Service {
