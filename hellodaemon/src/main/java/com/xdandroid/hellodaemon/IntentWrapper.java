@@ -274,9 +274,9 @@ public class IntentWrapper {
                 case MEIZU:
                     new AlertDialog.Builder(a)
                             .setCancelable(false)
-                            .setTitle("需要允许 " + getApplicationName() + " 的自启动")
-                            .setMessage(reason + "需要允许 " + getApplicationName() + " 的自启动。\n\n" +
-                                    "请点击『确定』，在弹出的应用信息界面中，将『自启动』开关打开。")
+                            .setTitle("需要允许 " + getApplicationName() + " 保持后台运行")
+                            .setMessage(reason + "需要允许 " + getApplicationName() + " 保持后台运行。\n\n" +
+                                    "请点击『确定』，在弹出的应用信息界面中，将『后台管理』选项更改为『保持后台运行』。")
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })

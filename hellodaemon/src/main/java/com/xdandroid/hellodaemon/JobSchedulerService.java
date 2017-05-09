@@ -16,7 +16,6 @@ public class JobSchedulerService extends JobService {
     public boolean onStartJob(JobParameters params) {
         if (!DaemonEnv.sInitialized) return false;
         try {startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));} catch (Exception ignored) {}
-        jobFinished(params, false);
         return false;
     }
 
