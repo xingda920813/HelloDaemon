@@ -20,7 +20,7 @@ public class IntentWrapper {
     protected static final int HUAWEI_GOD = 100;
     //小米 自启动管理
     protected static final int XIAOMI = 101;
-    //小米 神隐模式 (建议只在 App 的核心功能需要后台连接网络/后台定位的情况下使用)
+    //小米 神隐模式
     protected static final int XIAOMI_GOD = 102;
     //三星 5.0/5.1 自启动应用程序管理
     protected static final int SAMSUNG_L = 103;
@@ -89,9 +89,11 @@ public class IntentWrapper {
             xiaomiIntent.addCategory(Intent.CATEGORY_DEFAULT);
             sIntentWrapperList.add(new IntentWrapper(xiaomiIntent, XIAOMI));
 
-            //小米 神隐模式 (建议只在 App 的核心功能需要后台连接网络/后台定位的情况下使用)
+            //小米 神隐模式
             Intent xiaomiGodIntent = new Intent();
-            xiaomiGodIntent.setComponent(new ComponentName("com.miui.powerkeeper", "com.miui.powerkeeper.ui.HiddenAppsContainerManagementActivity"));
+            xiaomiGodIntent.setComponent(new ComponentName("com.miui.powerkeeper", "com.miui.powerkeeper.ui.HiddenAppsConfigActivity"));
+            xiaomiGodIntent.putExtra("package_name", DaemonEnv.sApp.getPackageName());
+            xiaomiGodIntent.putExtra("package_label", getApplicationName());
             sIntentWrapperList.add(new IntentWrapper(xiaomiGodIntent, XIAOMI_GOD));
 
             //三星 5.0/5.1 自启动应用程序管理
@@ -174,7 +176,7 @@ public class IntentWrapper {
 
     protected static String sApplicationName;
 
-    protected static String getApplicationName() {
+    public static String getApplicationName() {
         if (sApplicationName == null) {
             if (!DaemonEnv.sInitialized) return "";
             PackageManager pm;
@@ -249,8 +251,8 @@ public class IntentWrapper {
                     new AlertDialog.Builder(a)
                             .setCancelable(false)
                             .setTitle("需要关闭 " + getApplicationName() + " 的神隐模式")
-                            .setMessage(reason + "需要 " + getApplicationName() + " 的神隐模式关闭。\n\n" +
-                                    "请点击『确定』，在弹出的神隐模式应用列表中，点击 " + getApplicationName() + " ，然后选择『无限制』和『允许定位』。")
+                            .setMessage(reason + "需要关闭 " + getApplicationName() + " 的神隐模式。\n\n" +
+                                    "请点击『确定』，在弹出的 " + getApplicationName() + " 神隐模式设置中，选择『无限制』，然后选择『允许定位』。")
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
@@ -336,7 +338,7 @@ public class IntentWrapper {
                 case VIVO_GOD:
                     new AlertDialog.Builder(a)
                             .setCancelable(false)
-                            .setTitle(getApplicationName() + " 需要在后台高耗电时允许运行")
+                            .setTitle("需要允许 " + getApplicationName() + " 的后台运行")
                             .setMessage(reason + "需要允许 " + getApplicationName() + " 在后台高耗电时运行。\n\n" +
                                     "请点击『确定』，在弹出的『后台高耗电』中，将 " + getApplicationName() + " 对应的开关打开。")
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -372,7 +374,7 @@ public class IntentWrapper {
                 case LENOVO:
                     new AlertDialog.Builder(a)
                             .setCancelable(false)
-                            .setTitle("需要允许 " + getApplicationName() + " 的后台 GPS 和后台运行")
+                            .setTitle("需要允许 " + getApplicationName() + " 的后台运行")
                             .setMessage(reason + "需要允许 " + getApplicationName() + " 的后台自启、后台 GPS 和后台运行。\n\n" +
                                     "请点击『确定』，在弹出的『后台管理』中，分别找到『后台自启』、『后台 GPS』和『后台运行』，将 " + getApplicationName() + " 对应的开关打开。")
                             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
