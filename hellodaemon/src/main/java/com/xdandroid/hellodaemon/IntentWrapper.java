@@ -6,12 +6,13 @@ import android.content.pm.*;
 import android.net.*;
 import android.os.*;
 import android.provider.*;
+import android.support.annotation.NonNull;
 
 import java.util.*;
 
 public class IntentWrapper {
 
-    //Android 6.0+ Doze 模式
+    //Android 7.0+ Doze 模式
     protected static final int DOZE = 98;
     //华为 自启管理
     protected static final int HUAWEI = 99;
@@ -61,7 +62,7 @@ public class IntentWrapper {
             
             sIntentWrapperList = new ArrayList<>();
             
-            //Android 6.0+ Doze 模式
+            //Android 7.0+ Doze 模式
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 PowerManager pm = (PowerManager) DaemonEnv.sApp.getSystemService(Context.POWER_SERVICE);
                 boolean ignoringBatteryOptimizations = pm.isIgnoringBatteryOptimizations(DaemonEnv.sApp.getPackageName());
@@ -191,9 +192,12 @@ public class IntentWrapper {
     }
 
     /**
-     * 处理白名单
+     * 处理白名单.
+     * @return 弹过框的 IntentWrapper.
      */
-    public static void whiteListMatters(final Activity a, String reason) {
+    @NonNull
+    public static List<IntentWrapper> whiteListMatters(final Activity a, String reason) {
+        List<IntentWrapper> showed = new ArrayList<>();
         if (reason == null) reason = "核心服务的持续运行";
         List<IntentWrapper> intentWrapperList = getIntentWrapperList();
         for (final IntentWrapper iw : intentWrapperList) {
@@ -213,6 +217,7 @@ public class IntentWrapper {
                                     public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                                 })
                                 .show();
+                        showed.add(iw);
                     }
                     break;
                 case HUAWEI:
@@ -225,6 +230,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case ZTE_GOD:
                 case HUAWEI_GOD:
@@ -237,6 +243,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case XIAOMI_GOD:
                     new AlertDialog.Builder(a)
@@ -248,6 +255,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case SAMSUNG_L:
                     new AlertDialog.Builder(a)
@@ -259,6 +267,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case SAMSUNG_M:
                     new AlertDialog.Builder(a)
@@ -270,6 +279,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case MEIZU:
                     new AlertDialog.Builder(a)
@@ -281,6 +291,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case MEIZU_GOD:
                     new AlertDialog.Builder(a)
@@ -292,6 +303,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case ZTE:
                 case LETV:
@@ -307,6 +319,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case COOLPAD:
                     new AlertDialog.Builder(a)
@@ -318,6 +331,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case VIVO_GOD:
                     new AlertDialog.Builder(a)
@@ -329,6 +343,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case GIONEE:
                     new AlertDialog.Builder(a)
@@ -340,6 +355,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case LETV_GOD:
                     new AlertDialog.Builder(a)
@@ -351,6 +367,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case LENOVO:
                     new AlertDialog.Builder(a)
@@ -362,6 +379,7 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
                 case LENOVO_GOD:
                     new AlertDialog.Builder(a)
@@ -373,9 +391,11 @@ public class IntentWrapper {
                                 public void onClick(DialogInterface d, int w) {iw.startActivity(a);}
                             })
                             .show();
+                    showed.add(iw);
                     break;
             }
         }
+        return showed;
     }
 
     /**
