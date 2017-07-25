@@ -24,7 +24,7 @@ public class WakeUpReceiver extends BroadcastReceiver {
             return;
         }
         if (!DaemonEnv.sInitialized) return;
-        try {context.startService(new Intent(context, DaemonEnv.sServiceClass));} catch (Exception ignored) {}
+        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
     }
 
     public static class WakeUpAutoStartReceiver extends BroadcastReceiver {
@@ -32,7 +32,7 @@ public class WakeUpReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (!DaemonEnv.sInitialized) return;
-            try {context.startService(new Intent(context, DaemonEnv.sServiceClass));} catch (Exception ignored) {}
+            DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
         }
     }
 }

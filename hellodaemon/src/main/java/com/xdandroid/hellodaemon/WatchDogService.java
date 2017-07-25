@@ -37,7 +37,7 @@ public class WatchDogService extends Service {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             startForeground(HASH_CODE, new Notification());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                try {startService(new Intent(DaemonEnv.sApp, WatchDogNotificationService.class));} catch (Exception ignored) {}
+                DaemonEnv.startServiceSafely(new Intent(DaemonEnv.sApp, WatchDogNotificationService.class));
         }
 
         //定时检查 AbsWorkService 是否在运行，如果不在运行就把它拉起来
@@ -64,7 +64,7 @@ public class WatchDogService extends Service {
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
-                        startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));
+                        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -93,8 +93,8 @@ public class WatchDogService extends Service {
 
     protected void onEnd(Intent rootIntent) {
         if (!DaemonEnv.sInitialized) return;
-        try {startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));} catch (Exception ignored) {}
-        try {startService(new Intent(DaemonEnv.sApp, WatchDogService.class));} catch (Exception ignored) {}
+        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
+        DaemonEnv.startOrBindService(WatchDogService.class);
     }
 
     /**

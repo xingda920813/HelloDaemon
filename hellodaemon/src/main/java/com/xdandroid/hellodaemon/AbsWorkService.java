@@ -45,7 +45,7 @@ public abstract class AbsWorkService extends Service {
     protected int onStart(Intent intent, int flags, int startId) {
 
         //启动守护服务，运行在:watch子进程中
-        try {startService(new Intent(getApplication(), WatchDogService.class));} catch (Exception ignored) {}
+        DaemonEnv.startOrBindService(WatchDogService.class);
 
         //业务逻辑: 实际使用时，根据需求，将这里更改为自定义的条件，判定服务应当启动还是停止 (任务是否需要运行)
         Boolean shouldStopService = shouldStopService(intent, flags, startId);
@@ -61,7 +61,7 @@ public abstract class AbsWorkService extends Service {
                 startForeground(HASH_CODE, new Notification());
                 //利用漏洞在 API Level 18 及以上的 Android 系统中，启动前台服务而不显示通知
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                    try {startService(new Intent(getApplication(), WorkNotificationService.class));} catch (Exception ignored) {}
+                    DaemonEnv.startServiceSafely(new Intent(getApplication(), WorkNotificationService.class));
             }
             getPackageManager().setComponentEnabledSetting(new ComponentName(getPackageName(), WatchDogService.class.getName()),
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
@@ -111,8 +111,8 @@ public abstract class AbsWorkService extends Service {
     protected void onEnd(Intent rootIntent) {
         onServiceKilled(rootIntent);
         if (!DaemonEnv.sInitialized) return;
-        try {startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));} catch (Exception ignored) {}
-        try {startService(new Intent(DaemonEnv.sApp, WatchDogService.class));} catch (Exception ignored) {}
+        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
+        DaemonEnv.startOrBindService(WatchDogService.class);
     }
 
     /**

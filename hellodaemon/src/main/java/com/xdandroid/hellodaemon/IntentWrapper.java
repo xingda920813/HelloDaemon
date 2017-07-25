@@ -431,6 +431,6 @@ public class IntentWrapper {
      * 安全地启动一个Activity
      */
     protected void startActivity(Activity a) {
-        try {a.startActivity(intent);} catch (Exception e) {e.printStackTrace();}
+        try { a.startActivity(intent); } catch (Exception e) { e.printStackTrace(); }
     }
 }

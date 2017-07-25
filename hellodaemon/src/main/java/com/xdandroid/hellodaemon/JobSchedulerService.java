@@ -2,7 +2,6 @@ package com.xdandroid.hellodaemon;
 
 import android.annotation.*;
 import android.app.job.*;
-import android.content.*;
 import android.os.*;
 
 /**
@@ -15,7 +14,7 @@ public class JobSchedulerService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         if (!DaemonEnv.sInitialized) return false;
-        try {startService(new Intent(DaemonEnv.sApp, DaemonEnv.sServiceClass));} catch (Exception ignored) {}
+        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
         return false;
     }
 
