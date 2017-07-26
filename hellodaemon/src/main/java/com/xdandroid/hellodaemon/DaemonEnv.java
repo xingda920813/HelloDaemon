@@ -33,6 +33,7 @@ public final class DaemonEnv {
     }
 
     public static void startOrBindService(@NonNull final Class<? extends Service> serviceClass) {
+        if (!sInitialized) return;
         final Intent i = new Intent(sApp, serviceClass);
         startServiceSafely(i);
         Boolean bound = BIND_STATE_MAP.get(serviceClass);
@@ -46,12 +47,14 @@ public final class DaemonEnv {
             public void onServiceDisconnected(ComponentName componentName) {
                 BIND_STATE_MAP.put(serviceClass, false);
                 startServiceSafely(i);
+                if (!sInitialized) return;
                 sApp.bindService(i, this, Context.BIND_AUTO_CREATE);
             }
         }, Context.BIND_AUTO_CREATE);
     }
 
-    static void startServiceSafely(Intent i) {
+    public static void startServiceSafely(Intent i) {
+        if (!sInitialized) return;
         try { sApp.startService(i); } catch (Exception ignored) {}
     }
 

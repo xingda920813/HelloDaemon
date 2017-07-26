@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/xingda920813/HelloDaemon'
     gitUrl = 'https://github.com/xingda920813/HelloDaemon.git'
 
-    libraryVersion = '1.2.0'
+    libraryVersion = '1.2.1'
 
     developerId = 'xingda920813'
     developerName = 'Da Xing'
@@ -31,8 +31,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 9
-        versionName "1.2.0"
+        versionCode 10
+        versionName "1.2.1"
     }
     buildTypes {
         release {
