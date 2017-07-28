@@ -7,9 +7,8 @@ import com.xdandroid.hellodaemon.*;
 
 import java.util.concurrent.*;
 
-import io.reactivex.Flowable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.*;
+import io.reactivex.*;
+import io.reactivex.disposables.*;
 
 public class TraceServiceImpl extends AbsWorkService {
 
@@ -41,18 +40,12 @@ public class TraceServiceImpl extends AbsWorkService {
         sDisposable = Flowable
                 .interval(3, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
-                .doOnTerminate(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        System.out.println("保存数据到磁盘。");
-                        cancelJobAlarmSub();
-                    }
-                }).subscribe(new Consumer<Long>() {
-                    @Override
-                    public void accept(Long count) throws Exception {
-                        System.out.println("每 3 秒采集一次数据... count = " + count);
-                        if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
-                    }
+                .doOnTerminate(() -> {
+                    System.out.println("保存数据到磁盘。");
+                    cancelJobAlarmSub();
+                }).subscribe(count -> {
+                    System.out.println("每 3 秒采集一次数据... count = " + count);
+                    if (count > 0 && count % 18 == 0) System.out.println("保存数据到磁盘。 saveCount = " + (count / 18 - 1));
                 });
     }
 
