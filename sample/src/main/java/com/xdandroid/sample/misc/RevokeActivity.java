@@ -31,9 +31,9 @@ public class RevokeActivity extends Activity {
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
                   .forEach(i -> {
                       int uid = i.applicationInfo.uid;
-                      int targetSdkVersion = i.applicationInfo.targetSdkVersion;
                       String n = i.applicationInfo.packageName;
-                      if (targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
+                      try { setModeMethod.invoke(aom, 63, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
+                      if (i.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
                           Arrays.stream(i.requestedPermissions)
                                 .map(p -> {
                                     try { return pm.getPermissionInfo(p, 0); } catch (Exception e) { return null; }
@@ -49,13 +49,8 @@ public class RevokeActivity extends Activity {
                                 .forEach(op -> {
                                     try { setUidModeMethod.invoke(aom, op, uid, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                                 });
-                      }
-                      if (targetSdkVersion < Build.VERSION_CODES.M) {
                           try { setModeMethod.invoke(aom, 24, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                           try { setModeMethod.invoke(aom, 23, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
-                      }
-                      if (targetSdkVersion < Build.VERSION_CODES.O) {
-                          try { setModeMethod.invoke(aom, 63, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       }
                   });
             } catch (Exception e) { e.printStackTrace(); }
