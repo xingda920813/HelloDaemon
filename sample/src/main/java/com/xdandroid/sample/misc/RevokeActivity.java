@@ -32,6 +32,8 @@ public class RevokeActivity extends Activity {
                   .forEach(i -> {
                       int uid = i.applicationInfo.uid;
                       String n = i.applicationInfo.packageName;
+                      try { setModeMethod.invoke(aom, 10, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
+                      try { setModeMethod.invoke(aom, 40, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       try { setModeMethod.invoke(aom, 63, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       if (i.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
                           Arrays.stream(i.requestedPermissions)
@@ -49,8 +51,8 @@ public class RevokeActivity extends Activity {
                                 .forEach(op -> {
                                     try { setUidModeMethod.invoke(aom, op, uid, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                                 });
-                          try { setModeMethod.invoke(aom, 24, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                           try { setModeMethod.invoke(aom, 23, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
+                          try { setModeMethod.invoke(aom, 24, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       }
                   });
             } catch (Exception e) { e.printStackTrace(); }
