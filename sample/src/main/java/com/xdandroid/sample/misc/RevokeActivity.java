@@ -17,16 +17,16 @@ public class RevokeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
         new Thread(() -> {
             try {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
                 PackageManager pm = getPackageManager();
                 Class<AppOpsManager> aomClass = AppOpsManager.class;
                 AppOpsManager aom = getSystemService(aomClass);
                 Method setUidModeMethod = aomClass.getMethod("setUidMode", String.class, int.class, int.class);
                 Method setModeMethod = aomClass.getMethod("setMode", int.class, int.class, String.class, int.class);
                 pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
-                  .stream()
+                  .parallelStream()
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
                   .forEach(i -> {
@@ -37,11 +37,13 @@ public class RevokeActivity extends Activity {
                       try { setModeMethod.invoke(aom, 63, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       if (i.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
                           Arrays.stream(i.requestedPermissions)
+                                .parallel()
                                 .map(p -> {
                                     try { return pm.getPermissionInfo(p, 0); } catch (Exception e) { return null; }
                                 })
                                 .filter(Objects::nonNull)
-                                .filter(pi -> pi.protectionLevel == PermissionInfo.PROTECTION_DANGEROUS)
+                                .filter(pi -> pi.protectionLevel == PermissionInfo.PROTECTION_DANGEROUS
+                                        || pi.protectionLevel == 4096 + PermissionInfo.PROTECTION_DANGEROUS)
                                 .map(pi -> pi.name)
                                 .filter(pn -> pn.startsWith("android"))
                                 .filter(pn -> !"android.permission.READ_EXTERNAL_STORAGE".equals(pn))

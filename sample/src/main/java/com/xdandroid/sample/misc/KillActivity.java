@@ -15,13 +15,13 @@ public class KillActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
         new Thread(() -> {
             try {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
                 ActivityManager am = getSystemService(ActivityManager.class);
                 Method m = ActivityManager.class.getMethod("forceStopPackage", String.class);
                 getPackageManager().getInstalledPackages(0)
-                                   .stream()
+                                   .parallelStream()
                                    .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
                                    .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
                                    .map(i -> i.packageName)
