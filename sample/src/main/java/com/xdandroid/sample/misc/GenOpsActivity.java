@@ -1,5 +1,6 @@
 package com.xdandroid.sample.misc;
 
+import android.*;
 import android.app.*;
 import android.content.pm.*;
 import android.os.*;
@@ -10,7 +11,6 @@ import java.util.*;
 import java.util.stream.*;
 
 /**
- * targetSdkVersion 22
  * uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
  * android:theme="@android:style/Theme.NoDisplay"
  */
@@ -29,6 +29,11 @@ public class GenOpsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, hashCode());
+            finish();
+            return;
+        }
         new Thread(() -> {
             try (FileOutputStream fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "ops.sh"))) {
                 PackageManager pm = getPackageManager();
