@@ -32,7 +32,7 @@ public final class DaemonEnv {
         sInitialized = true;
     }
 
-    public static void startOrBindService(@NonNull final Class<? extends Service> serviceClass) {
+    public static void startServiceMayBind(@NonNull final Class<? extends Service> serviceClass) {
         if (!sInitialized) return;
         final Intent i = new Intent(sApp, serviceClass);
         startServiceSafely(i);

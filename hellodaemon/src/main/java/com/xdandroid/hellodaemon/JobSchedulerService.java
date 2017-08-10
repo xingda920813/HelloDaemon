@@ -14,7 +14,7 @@ public class JobSchedulerService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         if (!DaemonEnv.sInitialized) return false;
-        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
+        DaemonEnv.startServiceMayBind(DaemonEnv.sServiceClass);
         return false;
     }
 

@@ -4,7 +4,6 @@ import android.*;
 import android.app.*;
 import android.content.pm.*;
 import android.os.*;
-import android.text.*;
 
 import java.io.*;
 import java.util.*;
@@ -41,35 +40,12 @@ public class GenOpsActivity extends Activity {
                   .parallelStream()
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
-                  .map(i -> {
-                      String n = i.applicationInfo.packageName;
-                      Set<String> ops = new HashSet<>();
-                      ops.add(genOp(n, "WIFI_SCAN"));
-                      ops.add(genOp(n, "WAKE_LOCK"));
-                      ops.add(genOp(n, "RUN_IN_BACKGROUND"));
-                      if (i.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
-                          ops.addAll(Arrays
-                                  .stream(i.requestedPermissions)
-                                  .parallel()
-                                  .map(p -> {
-                                      try { return pm.getPermissionInfo(p, 0); } catch (Exception e) { return null; }
-                                  })
-                                  .filter(Objects::nonNull)
-                                  .filter(pi -> pi.protectionLevel == PermissionInfo.PROTECTION_DANGEROUS
-                                          || pi.protectionLevel == 4096 + PermissionInfo.PROTECTION_DANGEROUS)
-                                  .map(pi -> pi.name)
-                                  .filter(pn -> pn.startsWith("android"))
-                                  .filter(pn -> !"android.permission.READ_EXTERNAL_STORAGE".equals(pn))
-                                  .filter(pn -> !"android.permission.WRITE_EXTERNAL_STORAGE".equals(pn))
-                                  .map(AppOpsManager::permissionToOp)
-                                  .filter(op -> !TextUtils.isEmpty(op))
-                                  .map(op -> genOp(n, op))
-                                  .collect(Collectors.toSet()));
-                          ops.add(genOp(n, "WRITE_SETTINGS"));
-                          ops.add(genOp(n, "SYSTEM_ALERT_WINDOW"));
-                      }
-                      return ops;
-                  })
+                  .map(i -> i.applicationInfo.packageName)
+                  .map(n -> Stream
+                          .of("WIFI_SCAN", "WAKE_LOCK", "RUN_IN_BACKGROUND", "WRITE_SETTINGS", "SYSTEM_ALERT_WINDOW")
+                          .parallel()
+                          .map(op -> genOp(n, op))
+                          .collect(Collectors.toSet()))
                   .flatMap(Collection::parallelStream)
                   .forEach(op -> {
                       try {

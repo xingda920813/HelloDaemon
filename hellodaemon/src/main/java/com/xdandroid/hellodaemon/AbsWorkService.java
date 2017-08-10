@@ -45,7 +45,7 @@ public abstract class AbsWorkService extends Service {
     protected int onStart(Intent intent, int flags, int startId) {
 
         //启动守护服务，运行在:watch子进程中
-        DaemonEnv.startOrBindService(WatchDogService.class);
+        DaemonEnv.startServiceMayBind(WatchDogService.class);
 
         //业务逻辑: 实际使用时，根据需求，将这里更改为自定义的条件，判定服务应当启动还是停止 (任务是否需要运行)
         Boolean shouldStopService = shouldStopService(intent, flags, startId);
@@ -111,8 +111,8 @@ public abstract class AbsWorkService extends Service {
     protected void onEnd(Intent rootIntent) {
         onServiceKilled(rootIntent);
         if (!DaemonEnv.sInitialized) return;
-        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
-        DaemonEnv.startOrBindService(WatchDogService.class);
+        DaemonEnv.startServiceMayBind(DaemonEnv.sServiceClass);
+        DaemonEnv.startServiceMayBind(WatchDogService.class);
     }
 
     /**

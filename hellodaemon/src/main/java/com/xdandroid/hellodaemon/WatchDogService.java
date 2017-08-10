@@ -64,7 +64,7 @@ public class WatchDogService extends Service {
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Exception {
-                        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
+                        DaemonEnv.startServiceMayBind(DaemonEnv.sServiceClass);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -93,8 +93,8 @@ public class WatchDogService extends Service {
 
     protected void onEnd(Intent rootIntent) {
         if (!DaemonEnv.sInitialized) return;
-        DaemonEnv.startOrBindService(DaemonEnv.sServiceClass);
-        DaemonEnv.startOrBindService(WatchDogService.class);
+        DaemonEnv.startServiceMayBind(DaemonEnv.sServiceClass);
+        DaemonEnv.startServiceMayBind(WatchDogService.class);
     }
 
     /**
