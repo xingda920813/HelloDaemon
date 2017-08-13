@@ -37,16 +37,15 @@ public class GenOpsActivity extends Activity {
             try (FileOutputStream fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "ops.sh"))) {
                 PackageManager pm = getPackageManager();
                 pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
-                  .parallelStream()
+                  .stream()
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
                   .map(i -> i.applicationInfo.packageName)
                   .map(n -> Stream
                           .of("WIFI_SCAN", "WAKE_LOCK", "RUN_IN_BACKGROUND", "WRITE_SETTINGS", "SYSTEM_ALERT_WINDOW")
-                          .parallel()
                           .map(op -> genOp(n, op))
                           .collect(Collectors.toSet()))
-                  .flatMap(Collection::parallelStream)
+                  .flatMap(Collection::stream)
                   .forEach(op -> {
                       try {
                           fos.write(op.getBytes("UTF-8"));

@@ -21,7 +21,7 @@ public class KillActivity extends Activity {
                 ActivityManager am = getSystemService(ActivityManager.class);
                 Method m = ActivityManager.class.getMethod("forceStopPackage", String.class);
                 getPackageManager().getInstalledPackages(0)
-                                   .parallelStream()
+                                   .stream()
                                    .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
                                    .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
                                    .map(i -> i.packageName)

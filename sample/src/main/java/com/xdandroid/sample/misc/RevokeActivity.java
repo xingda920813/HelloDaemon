@@ -26,7 +26,7 @@ public class RevokeActivity extends Activity {
                 Method setUidModeMethod = aomClass.getMethod("setUidMode", String.class, int.class, int.class);
                 Method setModeMethod = aomClass.getMethod("setMode", int.class, int.class, String.class, int.class);
                 pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
-                  .parallelStream()
+                  .stream()
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
                   .forEach(i -> {
@@ -37,7 +37,6 @@ public class RevokeActivity extends Activity {
                       try { setModeMethod.invoke(aom, 63, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       if (i.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
                           Arrays.stream(i.requestedPermissions)
-                                .parallel()
                                 .map(p -> {
                                     try { return pm.getPermissionInfo(p, 0); } catch (Exception e) { return null; }
                                 })
