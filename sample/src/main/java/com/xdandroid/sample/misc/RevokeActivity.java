@@ -42,8 +42,7 @@ public class RevokeActivity extends Activity {
                                     try { return pm.getPermissionInfo(p, 0); } catch (Exception e) { return null; }
                                 })
                                 .filter(Objects::nonNull)
-                                .filter(pi -> pi.protectionLevel == PermissionInfo.PROTECTION_DANGEROUS
-                                        || pi.protectionLevel == 4096 + PermissionInfo.PROTECTION_DANGEROUS)
+                                .filter(pi -> (pi.protectionLevel & PermissionInfo.PROTECTION_DANGEROUS) != 0)
                                 .map(pi -> pi.name)
                                 .filter(pn -> pn.startsWith("android"))
                                 .filter(pn -> !"android.permission.READ_EXTERNAL_STORAGE".equals(pn))
