@@ -14,12 +14,12 @@ public final class DaemonEnv {
     public static final int DEFAULT_WAKE_UP_INTERVAL = 6 * 60 * 1000;
     private static final int MINIMAL_WAKE_UP_INTERVAL = 3 * 60 * 1000;
 
-    static final Map<Class<? extends Service>, Boolean> BIND_STATE_MAP = new HashMap<>();
-
     static Context sApp;
     static Class<? extends AbsWorkService> sServiceClass;
     private static int sWakeUpInterval = DEFAULT_WAKE_UP_INTERVAL;
     static boolean sInitialized;
+
+    static final Map<Class<? extends Service>, ServiceConnection> BIND_STATE_MAP = new HashMap<>();
 
     /**
      * @param app Application Context.
@@ -36,16 +36,16 @@ public final class DaemonEnv {
         if (!sInitialized) return;
         final Intent i = new Intent(sApp, serviceClass);
         startServiceSafely(i);
-        Boolean bound = BIND_STATE_MAP.get(serviceClass);
-        if (bound == null || !bound) sApp.bindService(i, new ServiceConnection() {
+        ServiceConnection bound = BIND_STATE_MAP.get(serviceClass);
+        if (bound == null) sApp.bindService(i, new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                BIND_STATE_MAP.put(serviceClass, true);
+                BIND_STATE_MAP.put(serviceClass, this);
             }
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
-                BIND_STATE_MAP.put(serviceClass, false);
+                BIND_STATE_MAP.remove(serviceClass);
                 startServiceSafely(i);
                 if (!sInitialized) return;
                 sApp.bindService(i, this, Context.BIND_AUTO_CREATE);
@@ -53,7 +53,7 @@ public final class DaemonEnv {
         }, Context.BIND_AUTO_CREATE);
     }
 
-    public static void startServiceSafely(Intent i) {
+    static void startServiceSafely(Intent i) {
         if (!sInitialized) return;
         try { sApp.startService(i); } catch (Exception ignored) {}
     }

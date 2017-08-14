@@ -1,7 +1,6 @@
 package com.xdandroid.sample;
 
 import android.app.*;
-import android.content.*;
 import android.os.*;
 import android.view.*;
 
@@ -16,12 +15,21 @@ public class MainActivity extends Activity {
 
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_start: DaemonEnv.startServiceSafely(new Intent(this, TraceServiceImpl.class)); break;
-            case R.id.btn_white: IntentWrapper.whiteListMatters(this, "轨迹跟踪服务的持续运行"); break;
-            case R.id.btn_stop: TraceServiceImpl.stopService(); break;
+            case R.id.btn_start:
+                TraceServiceImpl.sShouldStopService = false;
+                DaemonEnv.startServiceMayBind(TraceServiceImpl.class);
+                break;
+            case R.id.btn_white:
+                IntentWrapper.whiteListMatters(this, "轨迹跟踪服务的持续运行");
+                break;
+            case R.id.btn_stop:
+                TraceServiceImpl.stopService();
+                break;
         }
     }
 
     //防止华为机型未加入白名单时按返回键回到桌面再锁屏后几秒钟进程被杀
-    @Override public void onBackPressed() { IntentWrapper.onBackPressed(this); }
+    public void onBackPressed() {
+        IntentWrapper.onBackPressed(this);
+    }
 }

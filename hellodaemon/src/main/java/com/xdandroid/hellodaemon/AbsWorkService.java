@@ -36,7 +36,7 @@ public abstract class AbsWorkService extends Service {
     public abstract void onServiceKilled(Intent rootIntent);
 
     /**
-     * 1.防止重复启动，可以任意调用startService(Intent i);
+     * 1.防止重复启动，可以任意调用 DaemonEnv.startServiceMayBind(Class serviceClass);
      * 2.利用漏洞启动前台服务而不显示通知;
      * 3.在子线程中运行定时任务，处理了运行前检查和销毁时保存的问题;
      * 4.启动守护服务;

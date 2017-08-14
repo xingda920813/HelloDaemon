@@ -430,7 +430,7 @@ public class IntentWrapper {
     /**
      * 安全地启动一个Activity
      */
-    public void startActivitySafely(Activity activityContext) {
+    protected void startActivitySafely(Activity activityContext) {
         try { activityContext.startActivity(intent); } catch (Exception e) { e.printStackTrace(); }
     }
 }
