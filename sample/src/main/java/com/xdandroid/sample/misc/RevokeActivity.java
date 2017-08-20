@@ -21,10 +21,9 @@ public class RevokeActivity extends Activity {
         new Thread(() -> {
             try {
                 PackageManager pm = getPackageManager();
-                Class<AppOpsManager> aomClass = AppOpsManager.class;
-                AppOpsManager aom = getSystemService(aomClass);
-                Method setUidModeMethod = aomClass.getMethod("setUidMode", String.class, int.class, int.class);
-                Method setModeMethod = aomClass.getMethod("setMode", int.class, int.class, String.class, int.class);
+                AppOpsManager aom = getSystemService(AppOpsManager.class);
+                Method setUidModeMethod = AppOpsManager.class.getMethod("setUidMode", String.class, int.class, int.class);
+                Method setModeMethod = AppOpsManager.class.getMethod("setMode", int.class, int.class, String.class, int.class);
                 pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
                   .stream()
                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)

@@ -35,22 +35,17 @@ public class GenOpsActivity extends Activity {
         }
         new Thread(() -> {
             try (FileOutputStream fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory(), "ops.sh"))) {
-                PackageManager pm = getPackageManager();
-                pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
-                  .stream()
-                  .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
-                  .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
-                  .map(i -> i.applicationInfo.packageName)
-                  .flatMap(n -> Stream
-                          .of("WIFI_SCAN", "WAKE_LOCK", "RUN_IN_BACKGROUND", "WRITE_SETTINGS", "SYSTEM_ALERT_WINDOW")
-                          .map(op -> genOp(n, op)))
-                  .forEach(op -> {
-                      try {
-                          fos.write(op.getBytes("UTF-8"));
-                      } catch (IOException e) {
-                          throw asUnchecked(e);
-                      }
-                  });
+                getPackageManager().getInstalledPackages(PackageManager.GET_PERMISSIONS)
+                                   .stream()
+                                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
+                                   .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
+                                   .map(i -> i.applicationInfo.packageName)
+                                   .flatMap(n -> Stream
+                                           .of("WIFI_SCAN", "WAKE_LOCK", "RUN_IN_BACKGROUND", "WRITE_SETTINGS", "SYSTEM_ALERT_WINDOW")
+                                           .map(op -> genOp(n, op)))
+                                   .forEach(op -> {
+                                       try { fos.write(op.getBytes("UTF-8")); } catch (IOException e) { throw asUnchecked(e); }
+                                   });
             } catch (Exception e) { e.printStackTrace(); }
         }).start();
         finish();
