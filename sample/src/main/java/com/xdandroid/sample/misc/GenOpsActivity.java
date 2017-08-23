@@ -6,7 +6,6 @@ import android.content.pm.*;
 import android.os.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.stream.*;
 
 /**
@@ -16,7 +15,16 @@ import java.util.stream.*;
 public class GenOpsActivity extends Activity {
 
     static String genOp(String pkg, String op) {
-        return "adb shell cmd appops set " + pkg + " " + op + " ignore\n\n";
+        String mode;
+        switch (op) {
+            case "RUN_IN_BACKGROUND":
+                mode = "deny";
+                break;
+            default:
+                mode = "ignore";
+                break;
+        }
+        return "adb shell cmd appops set " + pkg + " " + op + " " + mode + "\n\n";
     }
 
     @SuppressWarnings("unchecked")
