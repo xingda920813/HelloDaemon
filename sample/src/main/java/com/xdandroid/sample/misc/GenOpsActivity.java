@@ -18,7 +18,7 @@ public class GenOpsActivity extends Activity {
         String mode;
         switch (op) {
             case "RUN_IN_BACKGROUND":
-                mode = "deny";
+                mode = "ignore";
                 break;
             default:
                 mode = "ignore";

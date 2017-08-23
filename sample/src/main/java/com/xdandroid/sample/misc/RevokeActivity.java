@@ -33,7 +33,7 @@ public class RevokeActivity extends Activity {
                       String n = i.applicationInfo.packageName;
                       try { setModeMethod.invoke(aom, 10, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       try { setModeMethod.invoke(aom, 40, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
-                      try { setModeMethod.invoke(aom, 63, uid, n, AppOpsManager.MODE_ERRORED); } catch (Exception e) { e.printStackTrace(); }
+                      try { setModeMethod.invoke(aom, 63, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       if (i.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
                           Arrays.stream(i.requestedPermissions)
                                 .map(p -> {
