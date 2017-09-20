@@ -17,16 +17,7 @@ import static com.xdandroid.sample.misc.RevokeActivity.*;
 public class GenOpsActivity extends Activity {
 
     static String genOp(String pkg, String op) {
-        String mode;
-        switch (op) {
-            case "RUN_IN_BACKGROUND":
-                mode = WHITE_LIST_APPS.contains(pkg) ? "allow" : "ignore";
-                break;
-            default:
-                mode = "ignore";
-                break;
-        }
-        return "adb shell cmd appops set " + pkg + " " + op + " " + mode + "\n\n";
+        return "adb shell cmd appops set " + pkg + " " + op + " " + ("RUN_IN_BACKGROUND".equals(op) && WHITE_LIST_APPS.contains(pkg) ? "allow" : "ignore") + "\n\n";
     }
 
     @SuppressWarnings("unchecked")
