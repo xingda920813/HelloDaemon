@@ -8,6 +8,8 @@ import android.os.*;
 import java.io.*;
 import java.util.stream.*;
 
+import static com.xdandroid.sample.misc.RevokeActivity.*;
+
 /**
  * uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
  * android:theme="@android:style/Theme.NoDisplay"
@@ -18,7 +20,7 @@ public class GenOpsActivity extends Activity {
         String mode;
         switch (op) {
             case "RUN_IN_BACKGROUND":
-                mode = "ignore";
+                mode = WHITE_LIST_APPS.contains(pkg) ? "allow" : "ignore";
                 break;
             default:
                 mode = "ignore";
@@ -48,9 +50,7 @@ public class GenOpsActivity extends Activity {
                                    .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
                                    .filter(i -> (i.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)
                                    .map(i -> i.applicationInfo.packageName)
-                                   .flatMap(n -> Stream
-                                           .of("WIFI_SCAN", "WAKE_LOCK", "RUN_IN_BACKGROUND", "WRITE_SETTINGS", "SYSTEM_ALERT_WINDOW")
-                                           .map(op -> genOp(n, op)))
+                                   .flatMap(n -> Stream.of(BLACK_LIST_OPS).map(op -> genOp(n, op)))
                                    .forEach(op -> {
                                        try { fos.write(op.getBytes("UTF-8")); } catch (IOException e) { throw asUnchecked(e); }
                                    });

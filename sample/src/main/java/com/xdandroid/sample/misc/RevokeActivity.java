@@ -14,6 +14,26 @@ import java.util.*;
  */
 public class RevokeActivity extends Activity {
 
+    static final List<String> WHITE_LIST_APPS = Arrays.asList(
+            "com.github.shadowsocks",
+            "com.tencent.mm",
+            "com.xdandroid.kill",
+            "me.piebridge.brevent"
+    );
+
+    static final List<String> WHITE_LIST_PERMISSIONS = Arrays.asList(
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE"
+    );
+
+    static final String[] BLACK_LIST_OPS = {
+            "WIFI_SCAN",
+            "WAKE_LOCK",
+            "RUN_IN_BACKGROUND",
+            "WRITE_SETTINGS",
+            "SYSTEM_ALERT_WINDOW"
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +53,7 @@ public class RevokeActivity extends Activity {
                       String n = i.applicationInfo.packageName;
                       try { setModeMethod.invoke(aom, 10, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       try { setModeMethod.invoke(aom, 40, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
-                      try { setModeMethod.invoke(aom, 63, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
+                      try { setModeMethod.invoke(aom, 63, uid, n, WHITE_LIST_APPS.contains(n) ? AppOpsManager.MODE_ALLOWED : AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       if (i.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
                           Arrays.stream(i.requestedPermissions)
                                 .map(p -> {
@@ -43,8 +63,7 @@ public class RevokeActivity extends Activity {
                                 .filter(pi -> (pi.protectionLevel & PermissionInfo.PROTECTION_MASK_BASE) == PermissionInfo.PROTECTION_DANGEROUS)
                                 .map(pi -> pi.name)
                                 .filter(pn -> pn.startsWith("android"))
-                                .filter(pn -> !"android.permission.READ_EXTERNAL_STORAGE".equals(pn))
-                                .filter(pn -> !"android.permission.WRITE_EXTERNAL_STORAGE".equals(pn))
+                                .filter(pn -> !WHITE_LIST_PERMISSIONS.contains(pn))
                                 .map(AppOpsManager::permissionToOp)
                                 .filter(op -> !TextUtils.isEmpty(op))
                                 .forEach(op -> {
