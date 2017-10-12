@@ -16,9 +16,16 @@ public class RevokeActivity extends Activity {
 
     static final List<String> WHITE_LIST_APPS = Arrays.asList(
             "com.github.shadowsocks",
-            "com.tencent.mm",
             "com.xdandroid.kill",
-            "me.piebridge.brevent"
+            "me.piebridge.brevent",
+
+            "com.alibaba.android.rimet",
+            "com.bearyinnovative.horcrux",
+            "com.tencent.mm",
+            "com.tencent.mobileqq",
+
+            "com.alibaba.alimei",
+            "com.tencent.androidqqmail"
     );
 
     static final List<String> WHITE_LIST_PERMISSIONS = Arrays.asList(
