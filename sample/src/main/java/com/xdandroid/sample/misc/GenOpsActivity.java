@@ -16,7 +16,7 @@ import static com.xdandroid.sample.misc.RevokeActivity.*;
  */
 public class GenOpsActivity extends Activity {
 
-    static String genOp(String pkg, String op) {
+/*    static String genOp(String pkg, String op) {
         return "adb shell cmd appops set " + pkg + " " + op + " " + ("RUN_IN_BACKGROUND".equals(op) && WHITE_LIST_APPS.contains(pkg) ? "allow" : "ignore") + "\n\n";
     }
 
@@ -48,5 +48,5 @@ public class GenOpsActivity extends Activity {
             } catch (Exception e) { e.printStackTrace(); }
         }).start();
         finish();
-    }
+    }*/
 }
