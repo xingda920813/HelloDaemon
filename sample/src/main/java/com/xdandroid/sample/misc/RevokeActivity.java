@@ -12,34 +12,7 @@ import java.util.*;
  * uses-permission android:name="android.permission.UPDATE_APP_OPS_STATS"
  * android:theme="@android:style/Theme.NoDisplay"
  */
-public class RevokeActivity extends Activity {
-
-    static final List<String> WHITE_LIST_APPS = Arrays.asList(
-            "com.github.shadowsocks",
-            "com.xdandroid.kill",
-            "me.piebridge.brevent",
-
-            "com.alibaba.android.rimet",
-            "com.bearyinnovative.horcrux",
-            "com.tencent.mm",
-            "com.tencent.mobileqq",
-
-            "com.alibaba.alimei",
-            "com.tencent.androidqqmail"
-    );
-
-    static final List<String> WHITE_LIST_PERMISSIONS = Arrays.asList(
-            "android.permission.READ_EXTERNAL_STORAGE",
-            "android.permission.WRITE_EXTERNAL_STORAGE"
-    );
-
-    static final String[] BLACK_LIST_OPS = {
-            "WIFI_SCAN",
-            "WAKE_LOCK",
-            "RUN_IN_BACKGROUND",
-            "WRITE_SETTINGS",
-            "SYSTEM_ALERT_WINDOW"
-    };
+public class RevokeActivity extends Activity implements Utils {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +34,7 @@ public class RevokeActivity extends Activity {
                       try { setModeMethod.invoke(aom, 10, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       try { setModeMethod.invoke(aom, 40, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       try { setModeMethod.invoke(aom, 63, uid, n, WHITE_LIST_APPS.contains(n) ? AppOpsManager.MODE_ALLOWED : AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
+                      if (shouldDisableBootCompletedOp()) try { setModeMethod.invoke(aom, 66, uid, n, WHITE_LIST_APPS.contains(n) ? AppOpsManager.MODE_ALLOWED : AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       if (i.applicationInfo.targetSdkVersion < Build.VERSION_CODES.M && i.requestedPermissions != null) {
                           Arrays.stream(i.requestedPermissions)
                                 .map(p -> {

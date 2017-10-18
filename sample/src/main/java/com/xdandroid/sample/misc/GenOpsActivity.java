@@ -1,31 +1,14 @@
 package com.xdandroid.sample.misc;
 
-import android.*;
 import android.app.*;
-import android.content.pm.*;
-import android.os.*;
-
-import java.io.*;
-import java.util.stream.*;
-
-import static com.xdandroid.sample.misc.RevokeActivity.*;
 
 /**
  * uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
  * android:theme="@android:style/Theme.NoDisplay"
  */
-public class GenOpsActivity extends Activity {
+public class GenOpsActivity extends Activity implements Utils {
 
-/*    static String genOp(String pkg, String op) {
-        return "adb shell cmd appops set " + pkg + " " + op + " " + ("RUN_IN_BACKGROUND".equals(op) && WHITE_LIST_APPS.contains(pkg) ? "allow" : "ignore") + "\n\n";
-    }
-
-    @SuppressWarnings("unchecked")
-    static <E extends Throwable, R extends RuntimeException> R asUnchecked(Throwable t) throws E {
-        throw (E) t;
-    }
-
-    @Override
+/*    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;

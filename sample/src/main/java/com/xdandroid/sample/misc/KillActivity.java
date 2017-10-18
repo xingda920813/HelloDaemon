@@ -6,13 +6,11 @@ import android.os.*;
 
 import java.lang.reflect.*;
 
-import static com.xdandroid.sample.misc.RevokeActivity.*;
-
 /**
  * uses-permission android:name="android.permission.FORCE_STOP_PACKAGES"
  * android:theme="@android:style/Theme.NoDisplay"
  */
-public class KillActivity extends Activity {
+public class KillActivity extends Activity implements Utils {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
