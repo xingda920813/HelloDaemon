@@ -8,6 +8,7 @@ import java.util.*;
 interface Utils {
 
     List<String> WHITE_LIST_APPS = Arrays.asList(
+            "com.breel.wallpapers",
             "com.github.shadowsocks",
             "com.xdandroid.kill",
             "me.piebridge.brevent",
