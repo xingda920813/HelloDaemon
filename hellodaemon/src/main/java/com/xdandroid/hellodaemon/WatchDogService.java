@@ -14,7 +14,7 @@ import android.os.IBinder;
 
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Flowable;
+import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
@@ -59,7 +59,7 @@ public class WatchDogService extends Service {
         }
 
         //使用定时 Observable，避免 Android 定制系统 JobScheduler / AlarmManager 唤醒间隔不稳定的情况
-        sDisposable = Flowable
+        sDisposable = Observable
                 .interval(DaemonEnv.getWakeUpInterval(), TimeUnit.MILLISECONDS)
                 .subscribe(new Consumer<Long>() {
                     @Override

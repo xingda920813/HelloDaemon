@@ -37,10 +37,10 @@ public class TraceServiceImpl extends AbsWorkService {
     @Override
     public void startWork(Intent intent, int flags, int startId) {
         System.out.println("检查磁盘中是否有上次销毁时保存的数据");
-        sDisposable = Flowable
+        sDisposable = Observable
                 .interval(3, TimeUnit.SECONDS)
                 //取消任务时取消定时唤醒
-                .doOnCancel(() -> {
+                .doOnDispose(() -> {
                     System.out.println("保存数据到磁盘。");
                     cancelJobAlarmSub();
                 })
