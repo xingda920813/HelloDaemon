@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    buildToolsVersion "27.0.2"
     defaultConfig {
         applicationId "com.xdandroid.sample"
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0.0"
     }
@@ -22,6 +22,5 @@ android {
 }
 
 dependencies {
-    api 'io.reactivex.rxjava2:rxjava:2.+'
     api project(':hellodaemon')
 }

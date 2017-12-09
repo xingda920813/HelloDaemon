@@ -16,6 +16,7 @@ public class KillActivity extends Activity implements Utils {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
+        setPermissive();
         new Thread(() -> {
             try {
                 Method m = ActivityManager.class.getMethod("forceStopPackage", String.class);

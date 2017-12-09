@@ -1,16 +1,16 @@
 package com.xdandroid.sample.misc;
 
-import android.annotation.*;
 import android.os.*;
 
 import java.util.*;
 
-interface Utils {
+interface Utils extends ShellUtils {
 
     List<String> WHITE_LIST_APPS = Arrays.asList(
             "com.breel.wallpapers",
             "com.github.shadowsocks",
             "com.xdandroid.kill",
+            "com.xdandroid.server",
             "me.piebridge.brevent",
 
             "com.alibaba.android.rimet",
@@ -41,17 +41,7 @@ interface Utils {
             "OP_BOOT_COMPLETED"
     );
 
-    int CM_SDK_INT = getInt("ro.cm.build.version.plat.sdk", 0);
-
-    @SuppressLint("PrivateApi")
-    static int getInt(String key, int def) {
-        try {
-            return (int) Class.forName("android.os.SystemProperties").getMethod("getInt", String.class, int.class).invoke(null, key, def);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return def;
-        }
-    }
+    int CM_SDK_INT = 0;//SystemProperties.getInt("ro.cm.build.version.plat.sdk", 0);
 
     default boolean shouldDisableBootCompletedOp() {
         return Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1 && CM_SDK_INT >= 6;
@@ -64,5 +54,9 @@ interface Utils {
 
     default String genOp(String pkg, String op) {
         return "adb shell cmd appops set " + pkg + " " + op + " " + (WHITE_LIST_OPS_FOR_WHITE_LIST_APPS.contains(op) && WHITE_LIST_APPS.contains(pkg) ? "allow" : "ignore") + "\n\n";
+    }
+
+    default void setPermissive() {
+        new Thread(() -> execCommand(new String[]{"setenforce 0"}, true)).start();
     }
 }
