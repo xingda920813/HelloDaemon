@@ -13,14 +13,16 @@ public class BootReceiver extends BroadcastReceiver {
         context = context.getApplicationContext();
         Context c = context;
         new Thread(() -> {
-            Intent revokeIntent = new Intent(c, RevokeActivity.class);
-            revokeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            c.startActivity(revokeIntent);
-            try { Thread.sleep(5 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }
-            Intent serverIntent = new Intent();
-            serverIntent.setComponent(new ComponentName("com.xdandroid.server", "com.xdandroid.server.TargetActivity"));
-            serverIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            c.startActivity(serverIntent);
+            try {
+                Intent revokeIntent = new Intent(c, RevokeActivity.class);
+                revokeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                c.startActivity(revokeIntent);
+                Thread.sleep(5 * 1000);
+                Intent serverIntent = new Intent();
+                serverIntent.setComponent(new ComponentName("com.xdandroid.server", "com.xdandroid.server.TargetActivity"));
+                serverIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                c.startActivity(serverIntent);
+            } catch (Exception e) { e.printStackTrace(); }
         }).start();
     }
 }
