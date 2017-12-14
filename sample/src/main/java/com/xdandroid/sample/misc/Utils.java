@@ -16,10 +16,8 @@ interface Utils extends ShellUtils {
             "com.alibaba.android.rimet",
             "com.bearyinnovative.horcrux",
             "com.tencent.mm",
-            "com.tencent.mobileqq",
-
-            "com.alibaba.alimei",
-            "com.tencent.androidqqmail"
+            "com.tencent.tim",
+            "com.alibaba.alimei"
     );
 
     List<String> WHITE_LIST_PERMISSIONS = Arrays.asList(
