@@ -10,10 +10,9 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        context = context.getApplicationContext();
-        Context c = context;
         new Thread(() -> {
             try {
+                Context c = context.getApplicationContext();
                 Intent revokeIntent = new Intent(c, RevokeActivity.class);
                 revokeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 c.startActivity(revokeIntent);
