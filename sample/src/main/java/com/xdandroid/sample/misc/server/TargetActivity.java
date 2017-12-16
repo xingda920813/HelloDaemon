@@ -10,7 +10,21 @@ import android.app.*;
  */
 public class TargetActivity extends Activity {
 
-/*    @SuppressWarnings("unchecked")
+/*    static final List<String> WHITE_LIST_APPS = Arrays.asList(
+            "com.breel.wallpapers",
+            "com.github.shadowsocks",
+            "com.xdandroid.kill",
+            "com.xdandroid.server",
+            "me.piebridge.brevent",
+
+            "com.alibaba.android.rimet",
+            "com.bearyinnovative.horcrux",
+            "com.tencent.mm",
+            "com.tencent.tim",
+            "com.alibaba.alimei"
+    );
+
+    @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +48,7 @@ public class TargetActivity extends Activity {
                             } catch (Exception e) { return null; }
                         })
                         .filter(Objects::nonNull)
+                        .filter(appInfo -> !WHITE_LIST_APPS.contains(appInfo.packageName))
                         .forEach(appInfo -> {
                             if (appInfo.targetSdkVersion >= Build.VERSION_CODES.M) appInfo.targetSdkVersion = Build.VERSION.SDK_INT;
                             if (appInfo.targetSdkVersion <= Build.VERSION_CODES.LOLLIPOP_MR1) appInfo.targetSdkVersion = Build.VERSION_CODES.LOLLIPOP_MR1;
