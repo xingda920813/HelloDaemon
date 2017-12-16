@@ -51,9 +51,9 @@ public class RevokeActivity extends Activity implements Utils {
                                 .forEach(op -> {
                                     try { setUidModeMethod.invoke(aom, op, uid, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                                 });
-                          try { setModeMethod.invoke(aom, 23, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
-                          try { setModeMethod.invoke(aom, 24, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                       }
+                      try { setModeMethod.invoke(aom, 23, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
+                      try { setModeMethod.invoke(aom, 24, uid, n, AppOpsManager.MODE_IGNORED); } catch (Exception e) { e.printStackTrace(); }
                   });
             } catch (Exception e) { e.printStackTrace(); }
         }).start();
