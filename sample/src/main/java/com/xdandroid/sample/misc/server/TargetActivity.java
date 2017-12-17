@@ -11,17 +11,7 @@ import android.app.*;
 public class TargetActivity extends Activity {
 
 /*    static final List<String> WHITE_LIST_APPS = Arrays.asList(
-            "com.breel.wallpapers",
-            "com.github.shadowsocks",
-            "com.xdandroid.kill",
-            "com.xdandroid.server",
-            "me.piebridge.brevent",
-
-            "com.alibaba.android.rimet",
-            "com.bearyinnovative.horcrux",
-            "com.tencent.mm",
-            "com.tencent.tim",
-            "com.alibaba.alimei"
+            "com.tencent.mm"
     );
 
     @SuppressWarnings("unchecked")
