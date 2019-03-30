@@ -1,4 +1,7 @@
 # HelloDaemon
+
+<a href="https://996.icu"><img src="https://img.shields.io/badge/link-996.icu-red.svg"></a>
+
 ### Android 服务保活/常驻 (Android Service Daemon)
 
 #### 建议只在App的核心功能需要保活/常驻时使用。
